@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
@@ -19,6 +19,23 @@ function SeriesModal({
 }) {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
   const slides = serie.photos.map((p) => ({ src: p.src, alt: p.title }));
+
+  // Lock body scroll while modal is open
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  // Close on Escape key
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => { if (e.key === "Escape" && lightboxIndex < 0) onClose(); },
+    [onClose, lightboxIndex]
+  );
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   return (
     <AnimatePresence>
@@ -46,7 +63,7 @@ function SeriesModal({
               </div>
               <button
                 onClick={onClose}
-                className="ml-4 p-2 text-stone-400 hover:text-white hover:bg-white/10 rounded-sm transition-colors flex-shrink-0"
+                className="ml-4 p-2 text-stone-400 hover:text-white hover:bg-white/10 rounded-sm transition-colors shrink-0"
                 aria-label="Fechar"
               >
                 <X size={22} />
@@ -75,7 +92,7 @@ function SeriesModal({
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     onContextMenu={(e) => e.preventDefault()}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                     <p className="font-serif text-white text-sm font-medium">
                       {photo.title}
@@ -106,7 +123,7 @@ function SeriesModal({
                 href={buildWhatsAppLink(serie.title)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-shrink-0 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm transition-colors duration-200 whitespace-nowrap"
+                className="shrink-0 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm transition-colors duration-200 whitespace-nowrap"
               >
                 <WhatsAppIcon size={16} />
                 Adquirir via WhatsApp
@@ -142,7 +159,7 @@ function SeriesModal({
                   href={buildWhatsAppLink(`${photo.title} (série ${serie.title})`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans text-xs font-semibold px-4 py-2 rounded-sm transition-colors"
+                  className="shrink-0 inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans text-xs font-semibold px-4 py-2 rounded-sm transition-colors"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <WhatsAppIcon size={13} />
@@ -211,7 +228,7 @@ export default function SeriesGallery() {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   onContextMenu={(e) => e.preventDefault()}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
                 {/* Photo count badge */}
                 <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm text-white text-xs font-sans px-2.5 py-1 rounded-sm">
                   <Images size={12} />

@@ -25,7 +25,7 @@ export default function AboutSection() {
                 className="object-cover protected-image"
               />
               {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-stone-950/60 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-stone-950/60 to-transparent" />
             </div>
             {/* Decorative frame */}
             <div className="absolute -bottom-4 -right-4 w-full h-full border border-red-700/40 rounded-sm -z-10" />

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { motion, Variants } from "framer-motion";
-import { MapPin, Calendar, ShoppingCart } from "lucide-react";
+import { MapPin, Calendar } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { photos, Photo } from "@/data/photos";
 import { buildWhatsAppLink } from "@/utils/whatsapp";
@@ -37,10 +37,10 @@ function PhotoSlideFooter({ photo }: { photo: Photo }) {
         href={buildWhatsAppLink(photo.title)}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex-shrink-0 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-5 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap"
+        className="shrink-0 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-5 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap"
         onClick={(e) => e.stopPropagation()}
       >
-        <ShoppingCart size={15} />
+        <WhatsAppIcon size={15} />
         Comprar via WhatsApp
       </a>
     </div>
@@ -132,7 +132,7 @@ export default function IndividualGallery() {
                 onContextMenu={(e) => e.preventDefault()}
               />
               {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                 <p className="font-serif text-white text-sm font-medium leading-tight">
                   {photo.title}

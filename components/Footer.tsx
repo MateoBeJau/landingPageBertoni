@@ -121,7 +121,7 @@ export default function Footer() {
               >
                 <WhatsAppIcon
                   size={15}
-                  className="text-[#25D366] flex-shrink-0"
+                  className="text-[#25D366] shrink-0"
                 />
                 <span className="font-sans text-sm">WhatsApp</span>
               </a>
@@ -129,7 +129,7 @@ export default function Footer() {
                 href="mailto:contato@alvarobertoni.com.br"
                 className="flex items-center gap-2.5 text-stone-400 hover:text-white transition-colors duration-200"
               >
-                <Mail size={15} className="text-stone-500 flex-shrink-0" />
+                <Mail size={15} className="text-stone-500 shrink-0" />
                 <span className="font-sans text-sm">
                   contato@alvarobertoni.com.br
                 </span>
