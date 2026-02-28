@@ -58,7 +58,7 @@ export default function HeroSection() {
               Fale pelo WhatsApp
             </a>
             <a
-              href="#individuais"
+              href="#foto-unica"
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-sans font-medium text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm tracking-wide transition-all duration-200 border border-white/20 hover:border-white/40"
             >
               Ver Portfólio
