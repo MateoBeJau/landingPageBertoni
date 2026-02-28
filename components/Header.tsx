@@ -6,8 +6,9 @@ import { buildWhatsAppLink } from "@/utils/whatsapp";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
-  { label: "Individuais", href: "#individuais" },
+  { label: "Fotografia Única", href: "#foto-unica" },
   { label: "Séries", href: "#series" },
+  { label: "Ensaios", href: "#ensaios" },
   { label: "Sobre", href: "#sobre" },
   { label: "Contato", href: "#contato" },
 ];
@@ -46,7 +47,7 @@ export default function Header() {
             />
             <div className="flex flex-col leading-none">
               <span className="font-serif text-white font-semibold text-lg tracking-wide">
-                Álvaro Bertoni
+                Álvaro Sanguinetti
               </span>
               <span className="text-stone-400 text-[10px] uppercase tracking-[0.2em] font-sans">
                 Fotografia
@@ -70,7 +71,7 @@ export default function Header() {
               href={buildWhatsAppLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-2 bg-red-700 hover:bg-red-600 text-white text-sm font-sans font-medium px-4 py-2 rounded-sm tracking-wide transition-colors duration-200"
+              className="ml-2 bg-[#8B1E1E] hover:bg-[#a02424] text-white text-sm font-sans font-medium px-4 py-2 rounded-sm tracking-wide transition-colors duration-200"
             >
               Orçamento
             </a>
@@ -109,7 +110,7 @@ export default function Header() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleNavClick}
-            className="mt-2 bg-red-700 hover:bg-red-600 text-white text-sm font-sans font-medium px-4 py-3 rounded-sm tracking-wide transition-colors duration-200 text-center"
+            className="mt-2 bg-[#8B1E1E] hover:bg-[#a02424] text-white text-sm font-sans font-medium px-4 py-3 rounded-sm tracking-wide transition-colors duration-200 text-center"
           >
             Solicitar Orçamento
           </a>

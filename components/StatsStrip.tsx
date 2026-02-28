@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "15+", label: "Anos de experiência" },
-  { value: "100+", label: "Fotografias no portfólio" },
-  { value: "4", label: "Séries fotográficas" },
-  { value: "RS & BR", label: "Regiões fotografadas" },
+  { value: "—", label: "Foto Única" },
+  { value: "—", label: "Série" },
+  { value: "—", label: "Ensaios" },
+  { value: "—", label: "Exposições" },
 ];
 
 export default function StatsStrip() {

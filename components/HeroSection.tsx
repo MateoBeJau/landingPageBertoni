@@ -35,18 +35,15 @@ export default function HeroSection() {
 
           {/* Headline */}
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-semibold leading-tight mb-4 md:mb-6">
-            Registrando a alma{" "}
+            Um olhar poético{" "}
             <br className="hidden sm:block" />
-            <span className="text-stone-300">do Rio Grande do Sul</span>
-            <br className="hidden sm:block" />
-            e do Brasil
+            <span className="text-stone-300">sobre o mundo</span>
           </h1>
 
           {/* Subtext */}
           <p className="font-sans text-stone-300 text-base sm:text-lg md:text-xl leading-relaxed mb-8 md:mb-10 max-w-2xl mx-auto md:mx-0">
-            Imagens que capturam o pampa, as tradições, o litoral e a
-            grandiosidade do Brasil. Arte fotográfica para impressão, coleção e
-            decoração.
+            Imagens que atravessam culturas, paisagens e emoções. Fotografia
+            autoral para quem busca beleza e originalidade na decoração.
           </p>
 
           {/* CTA Buttons */}

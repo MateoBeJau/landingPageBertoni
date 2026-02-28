@@ -19,7 +19,7 @@ export default function AboutSection() {
             <div className="relative overflow-hidden rounded-sm" style={{ aspectRatio: "4/5" }}>
               <Image
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=85"
-                alt="Álvaro Bertoni, fotógrafo profissional"
+                alt="Álvaro Sanguinetti, fotógrafo profissional"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover protected-image"
@@ -42,7 +42,7 @@ export default function AboutSection() {
               Sobre o Fotógrafo
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white font-semibold mb-6 leading-tight">
-              Álvaro Bertoni
+              Álvaro Sanguinetti
             </h2>
             <div className="w-10 h-0.5 bg-red-700 mb-6" />
 

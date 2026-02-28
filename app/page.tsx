@@ -3,6 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import StatsStrip from "@/components/StatsStrip";
 import IndividualGallery from "@/components/IndividualGallery";
 import SeriesGallery from "@/components/SeriesGallery";
+import EnsaiosSection from "@/components/EnsaiosSection";
 import ContactBanner from "@/components/ContactBanner";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
@@ -17,6 +18,7 @@ export default function Home() {
         <StatsStrip />
         <IndividualGallery />
         <SeriesGallery />
+        <EnsaiosSection />
         <ContactBanner />
         <AboutSection />
       </main>

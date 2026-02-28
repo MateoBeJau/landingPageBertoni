@@ -2,15 +2,26 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { motion, Variants } from "framer-motion";
-import { MapPin, Calendar } from "lucide-react";
+import { MapPin, Calendar, ExternalLink } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { photos, Photo } from "@/data/photos";
 import { buildWhatsAppLink } from "@/utils/whatsapp";
 
-const categories = ["Todos", "Paisagem", "Litoral", "Serra", "Fauna", "Cultura", "Retratos", "Brasil"];
+const categories = [
+  "Todas",
+  "Paisagens",
+  "Urbano & Arquitetura",
+  "Natureza",
+  "Abstrato & Experimental",
+  "Documental",
+  "Artístico & Conceitual",
+  "Detalhes & Texturas",
+  "Sazonal & Temático",
+];
 
 function PhotoSlideFooter({ photo }: { photo: Photo }) {
   return (
@@ -33,16 +44,26 @@ function PhotoSlideFooter({ photo }: { photo: Photo }) {
           </p>
         )}
       </div>
-      <a
-        href={buildWhatsAppLink(photo.title)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="shrink-0 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-5 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <WhatsAppIcon size={15} />
-        Comprar via WhatsApp
-      </a>
+      <div className="flex items-center gap-2 shrink-0">
+        <Link
+          href={`/foto/${photo.id}`}
+          className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-sans font-medium text-sm px-4 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap border border-white/20"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <ExternalLink size={14} />
+          Ver detalhes
+        </Link>
+        <a
+          href={buildWhatsAppLink(photo.title)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-5 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <WhatsAppIcon size={15} />
+          Consultar
+        </a>
+      </div>
     </div>
   );
 }
@@ -62,7 +83,7 @@ export default function IndividualGallery() {
   const [activeCategory, setActiveCategory] = useState("Todos");
 
   const filtered =
-    activeCategory === "Todos"
+    activeCategory === "Todas"
       ? photos
       : photos.filter((p) => p.category === activeCategory);
 
@@ -72,7 +93,7 @@ export default function IndividualGallery() {
   }));
 
   return (
-    <section id="individuais" className="py-20 md:py-28 bg-white">
+    <section id="foto-unica" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
@@ -80,11 +101,16 @@ export default function IndividualGallery() {
             Portfólio
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
-            Fotografias Individuais
+            Foto Única
           </h2>
           <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Cada imagem conta uma história única. Disponíveis para impressão em
-            diferentes formatos e tamanhos, com qualidade de museu.
+            Cada imagem carrega um instante decisivo, uma luz encontrada, uma emoção congelada no
+            tempo. Disponíveis para impressão em fine art, com curadoria de acabamento e suporte sob
+            medida para cada obra.
+          </p>
+          <p className="font-sans text-stone-400 text-sm max-w-2xl mx-auto leading-relaxed mt-3">
+            Disponíveis em diferentes formatos, tamanhos e suportes com qualidade premium — papel
+            fine art, canvas ou papel fotográfico.
           </p>
           <div className="w-12 h-0.5 bg-red-700 mx-auto mt-6" />
         </div>
@@ -161,7 +187,7 @@ export default function IndividualGallery() {
             href={buildWhatsAppLink()}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-stone-900 hover:bg-stone-800 text-white font-sans font-medium text-sm px-6 py-3 rounded-sm tracking-wide transition-colors duration-200"
+            className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm tracking-wide transition-colors duration-200"
           >
             <WhatsAppIcon size={15} />
             Consultar Valores

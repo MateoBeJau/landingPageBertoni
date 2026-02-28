@@ -3,8 +3,8 @@ export const WHATSAPP_NUMBER = "5551999999999";
 
 export function buildWhatsAppLink(context?: string): string {
   const message = context
-    ? `Olá, Álvaro! Tenho interesse na foto/série "${context}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`
-    : `Olá, Álvaro! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.`;
+    ? `Olá, tenho interesse na foto "${context}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`
+    : `Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.`;
 
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

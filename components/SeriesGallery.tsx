@@ -198,9 +198,9 @@ export default function SeriesGallery() {
             Séries Fotográficas
           </h2>
           <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Conjuntos de fotografias que narram histórias e capturam a essência
-            de lugares e culturas. Disponíveis em impressões avulsas ou como
-            coleção completa.
+            Conjuntos de imagens que exploram um tema em profundidade — seja a luz de um lugar, a
+            geometria urbana ou as texturas do tempo. Cada série é uma imersão poética, disponível
+            em impressões avulsas ou como coleção para ambientes que pedem uma história visual coesa.
           </p>
           <div className="w-12 h-0.5 bg-red-700 mx-auto mt-6" />
         </div>
