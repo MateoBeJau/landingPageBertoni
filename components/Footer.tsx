@@ -1,19 +1,8 @@
+"use client";
+
 import { Camera, Instagram, Facebook, Mail } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
-import { buildWhatsAppLink } from "@/utils/whatsapp";
-
-const socialLinks = [
-  {
-    icon: Instagram,
-    label: "Instagram",
-    href: "https://instagram.com/alvarobertoni",
-  },
-  {
-    icon: Facebook,
-    label: "Facebook",
-    href: "https://facebook.com/alvarobertoni",
-  },
-];
+import { useTenant } from "@/components/TenantProvider";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
@@ -24,7 +13,16 @@ const navLinks = [
 ];
 
 export default function Footer() {
+  const tenant = useTenant();
   const year = new Date().getFullYear();
+  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
+    "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
+  )}`;
+
+  const socialLinks = [
+    ...(tenant.instagramUrl ? [{ icon: Instagram, label: "Instagram", href: tenant.instagramUrl }] : []),
+    ...(tenant.facebookUrl ? [{ icon: Facebook, label: "Facebook", href: tenant.facebookUrl }] : []),
+  ];
 
   return (
     <footer className="bg-stone-950 border-t border-stone-800">
@@ -34,10 +32,10 @@ export default function Footer() {
           {/* Brand column */}
           <div className="sm:col-span-2 lg:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <Camera size={20} className="text-red-600" />
+              <Camera size={20} style={{ color: tenant.colorPrimary }} />
               <div>
                 <p className="font-serif text-white font-semibold text-lg">
-                  Álvaro Sanguinetti
+                  {tenant.name}
                 </p>
                 <p className="font-sans text-stone-500 text-[10px] uppercase tracking-[0.2em]">
                   Fotografia
@@ -45,24 +43,25 @@ export default function Footer() {
               </div>
             </div>
             <p className="font-sans text-stone-500 text-sm leading-relaxed">
-              Fotografia autoral que atravessa culturas, paisagens e emoções.
-              Arte para impressão, coleção e decoração.
+              Fotografia autoral de {tenant.name}. Arte para impressão, coleção e decoração.
             </p>
             {/* Social links */}
-            <div className="flex items-center gap-3 mt-5">
-              {socialLinks.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={s.label}
-                  className="w-9 h-9 flex items-center justify-center rounded-sm bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white transition-colors duration-200"
-                >
-                  <s.icon size={16} />
-                </a>
-              ))}
-            </div>
+            {socialLinks.length > 0 && (
+              <div className="flex items-center gap-3 mt-5">
+                {socialLinks.map((s) => (
+                  <a
+                    key={s.label}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.label}
+                    className="w-9 h-9 flex items-center justify-center rounded-sm bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white transition-colors duration-200"
+                  >
+                    <s.icon size={16} />
+                  </a>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Navigation */}
@@ -115,7 +114,7 @@ export default function Footer() {
             </h4>
             <div className="space-y-3">
               <a
-                href={buildWhatsAppLink()}
+                href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2.5 text-stone-400 hover:text-white transition-colors duration-200 group"
@@ -126,15 +125,17 @@ export default function Footer() {
                 />
                 <span className="font-sans text-sm">WhatsApp</span>
               </a>
-              <a
-                href="mailto:contato@alvarobertoni.com.br"
-                className="flex items-center gap-2.5 text-stone-400 hover:text-white transition-colors duration-200"
-              >
-                <Mail size={15} className="text-stone-500 shrink-0" />
-                <span className="font-sans text-sm">
-                  contato@alvarobertoni.com.br
-                </span>
-              </a>
+              {tenant.email && (
+                <a
+                  href={`mailto:${tenant.email}`}
+                  className="flex items-center gap-2.5 text-stone-400 hover:text-white transition-colors duration-200"
+                >
+                  <Mail size={15} className="text-stone-500 shrink-0" />
+                  <span className="font-sans text-sm">
+                    {tenant.email}
+                  </span>
+                </a>
+              )}
             </div>
 
             <div className="mt-5 bg-stone-900 border border-stone-800 rounded-sm p-3">
@@ -151,7 +152,7 @@ export default function Footer() {
       <div className="border-t border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="font-sans text-stone-600 text-xs">
-            © {year} Álvaro Sanguinetti Fotografia. Todos os direitos reservados.
+            © {year} {tenant.name} Fotografia. Todos os direitos reservados.
           </p>
           <p className="font-sans text-stone-700 text-xs">
             Porto Alegre · Rio Grande do Sul · Brasil

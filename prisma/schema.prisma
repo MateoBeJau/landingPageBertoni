@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Admin (platform-level) ──────────────────────────────────────────────────
+
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Tenant (each photographer site) ────────────────────────────────────────
+
+model Tenant {
+  id   String @id @default(cuid())
+  slug String @unique
+  // Custom domain, e.g. "alvarosanguinetti.com"
+  domain String? @unique
+
+  // ── Branding ──
+  name           String // Photographer name displayed in header
+  subtitle       String @default("Fotografia") // Under the name
+  whatsappNumber String
+  email          String?
+
+  colorPrimary String @default("#8B1E1E") // Header button, accents
+  colorAccent  String @default("#B76E4B") // Contact banner bg
+  colorCta     String @default("#25D366") // CTA buttons
+
+  // ── Hero Section ──
+  heroTitle    String @default("Um olhar poético sobre o mundo")
+  heroSubtitle String @default("Imagens que atravessam culturas, paisagens e emoções.")
+  heroImage    String // Vercel Blob URL
+  heroBadge    String @default("Fotógrafo Profissional")
+
+  // ── About Section ──
+  aboutTitle String?
+  aboutText1 String?
+  aboutText2 String?
+  aboutText3 String?
+  aboutImage String? // Vercel Blob URL
+
+  // ── Contact banner ──
+  contactTitle String @default("Interessado em alguma imagem?")
+  contactText  String @default("Entre em contato pelo WhatsApp para consultar valores, formatos de impressão disponíveis e condições exclusivas.")
+
+  // ── Stats ──
+  stat1Value String @default("—")
+  stat1Label String @default("Foto Única")
+  stat2Value String @default("—")
+  stat2Label String @default("Série")
+  stat3Value String @default("—")
+  stat3Label String @default("Ensaios")
+  stat4Value String @default("—")
+  stat4Label String @default("Exposições")
+
+  // ── Social ──
+  instagramUrl String?
+  facebookUrl  String?
+
+  // ── SEO ──
+  metaTitle       String?
+  metaDescription String?
+
+  // ── Categories (comma-separated for simplicity) ──
+  categories String @default("Todas,Paisagens,Natureza,Urbano & Arquitetura,Abstrato & Experimental,Documental,Artístico & Conceitual")
+
+  // ── Limits ──
+  maxPhotos Int @default(10)
+
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // ── Relations ──
+  photos  Photo[]
+  series  Series[]
+  ensaios Ensaio[]
+  users   TenantUser[]
+}
+
+// ─── TenantUser (photographer login) ────────────────────────────────────────
+
+model TenantUser {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  email    String @unique
+  password String
+  name     String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+// ─── Photo (individual gallery) ─────────────────────────────────────────────
+
+model Photo {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  title       String
+  slug        String
+  location    String
+  year        Int
+  description String?
+  category    String?
+
+  imageSrc   String // Full-res Vercel Blob URL
+  imageThumb String // Thumbnail Vercel Blob URL
+
+  price     String?
+  format    String?
+  printType String?
+
+  order  Int     @default(0)
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  seriesPhotos SeriesPhoto[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, active, order])
+}
+
+// ─── Series ─────────────────────────────────────────────────────────────────
+
+model Series {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  title       String
+  slug        String
+  subtitle    String
+  description String
+  cover       String // Vercel Blob URL
+
+  order  Int     @default(0)
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  photos SeriesPhoto[]
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, active, order])
+}
+
+// ─── SeriesPhoto (photos inside a series) ───────────────────────────────────
+
+model SeriesPhoto {
+  id       String @id @default(cuid())
+  seriesId String
+  series   Series @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  photoId  String?
+  photo    Photo?  @relation(fields: [photoId], references: [id], onDelete: SetNull)
+
+  title      String
+  location   String
+  year       Int
+  imageSrc   String
+  imageThumb String
+
+  order Int @default(0)
+
+  @@index([seriesId, order])
+}
+
+// ─── Ensaio ─────────────────────────────────────────────────────────────────
+
+model Ensaio {
+  id       String @id @default(cuid())
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  title       String
+  slug        String
+  subtitle    String
+  description String
+  cover       String // Vercel Blob URL
+  priceInfo   String @default("Sob consulta")
+
+  order  Int     @default(0)
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, slug])
+  @@index([tenantId, active, order])
+}

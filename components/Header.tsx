@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Menu, X, Camera } from "lucide-react";
-import { buildWhatsAppLink } from "@/utils/whatsapp";
+import { useTenant } from "@/components/TenantProvider";
 
 const navLinks = [
   { label: "Início", href: "#inicio" },
@@ -13,9 +13,15 @@ const navLinks = [
   { label: "Contato", href: "#contato" },
 ];
 
+const WHATSAPP_MESSAGE =
+  "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.";
+
 export default function Header() {
+  const tenant = useTenant();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
+  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
@@ -47,10 +53,10 @@ export default function Header() {
             />
             <div className="flex flex-col leading-none">
               <span className="font-serif text-white font-semibold text-lg tracking-wide">
-                Álvaro Sanguinetti
+                {tenant.name}
               </span>
               <span className="text-stone-400 text-[10px] uppercase tracking-[0.2em] font-sans">
-                Fotografia
+                {tenant.subtitle}
               </span>
             </div>
           </a>
@@ -64,14 +70,18 @@ export default function Header() {
                 className="text-stone-300 hover:text-white text-sm font-sans font-medium tracking-wide transition-colors duration-200 relative group"
               >
                 {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-red-600 transition-all duration-300 group-hover:w-full" />
+                <span
+                  className="absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: tenant.colorPrimary }}
+                />
               </a>
             ))}
             <a
-              href={buildWhatsAppLink()}
+              href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-2 bg-[#8B1E1E] hover:bg-[#a02424] text-white text-sm font-sans font-medium px-4 py-2 rounded-sm tracking-wide transition-colors duration-200"
+              className="ml-2 hover:opacity-90 text-white text-sm font-sans font-medium px-4 py-2 rounded-sm tracking-wide transition-colors duration-200"
+              style={{ backgroundColor: tenant.colorPrimary }}
             >
               Orçamento
             </a>
@@ -106,11 +116,12 @@ export default function Header() {
             </a>
           ))}
           <a
-            href={buildWhatsAppLink()}
+            href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             onClick={handleNavClick}
-            className="mt-2 bg-[#8B1E1E] hover:bg-[#a02424] text-white text-sm font-sans font-medium px-4 py-3 rounded-sm tracking-wide transition-colors duration-200 text-center"
+            className="mt-2 hover:opacity-90 text-white text-sm font-sans font-medium px-4 py-3 rounded-sm tracking-wide transition-colors duration-200 text-center"
+            style={{ backgroundColor: tenant.colorPrimary }}
           >
             Solicitar Orçamento
           </a>

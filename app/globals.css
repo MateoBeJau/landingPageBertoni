@@ -49,6 +49,23 @@ h1, h2, h3 {
   user-select: none !important;
 }
 
+.yarl__slide {
+  position: relative;
+}
+
+@media (max-width: 640px) {
+  .yarl__slide {
+    flex-direction: column !important;
+    justify-content: center !important;
+  }
+
+  .yarl__slide_image {
+    max-height: 60vh !important;
+    width: 100% !important;
+    object-fit: contain;
+  }
+}
+
 /* Scrollbar elegante */
 ::-webkit-scrollbar {
   width: 6px;

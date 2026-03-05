@@ -7,18 +7,35 @@ import "yet-another-react-lightbox/styles.css";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { X, Images, ChevronRight, MapPin, Calendar } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
-import { series, PhotoSeries } from "@/data/series";
-import { buildWhatsAppLink } from "@/utils/whatsapp";
+import { useTenant } from "@/components/TenantProvider";
+import type { TenantSeries, TenantConfig } from "@/lib/types";
+
+function buildWhatsAppUrl(whatsappNumber: string, context?: string): string {
+  const message = context
+    ? `Olá, tenho interesse na foto "${context}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`
+    : `Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.`;
+  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
 
 function SeriesModal({
   serie,
+  tenant,
   onClose,
 }: {
-  serie: PhotoSeries;
+  serie: TenantSeries;
+  tenant: TenantConfig;
   onClose: () => void;
 }) {
   const [lightboxIndex, setLightboxIndex] = useState(-1);
-  const slides = serie.photos.map((p) => ({ src: p.src, alt: p.title }));
+  const hasPhotos = serie.photos.some((p) => p.imageSrc || p.imageThumb);
+  const displayPhotos = hasPhotos
+    ? serie.photos
+    : serie.cover
+      ? [{ id: "cover", title: serie.title, location: "", year: 0, imageSrc: serie.cover, imageThumb: serie.cover, order: 0 }]
+      : [];
+  const slides = displayPhotos
+    .filter((p) => p.imageSrc || p.imageThumb)
+    .map((p, i) => ({ src: p.imageSrc || p.imageThumb, alt: p.title || `Photo ${i + 1}` }));
 
   // Lock body scroll while modal is open
   useEffect(() => {
@@ -40,6 +57,7 @@ function SeriesModal({
   return (
     <AnimatePresence>
       <motion.div
+        key="series-modal"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -51,7 +69,7 @@ function SeriesModal({
             {/* Header */}
             <div className="flex items-start justify-between mb-8 pt-4">
               <div>
-                <p className="font-sans text-red-500 text-xs uppercase tracking-[0.2em] mb-1">
+                <p className="font-sans text-xs uppercase tracking-[0.2em] mb-1" style={{ color: tenant.colorPrimary }}>
                   Série Fotográfica
                 </p>
                 <h2 className="font-serif text-white text-2xl sm:text-3xl md:text-4xl font-semibold">
@@ -71,26 +89,27 @@ function SeriesModal({
             </div>
 
             {/* Description */}
-            <p className="font-sans text-stone-400 text-sm sm:text-base leading-relaxed mb-8 max-w-3xl border-l-2 border-red-700 pl-4">
+            <p className="font-sans text-stone-400 text-sm sm:text-base leading-relaxed mb-8 max-w-3xl border-l-2 pl-4" style={{ borderColor: tenant.colorPrimary }}>
               {serie.description}
             </p>
 
             {/* Photos Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
-              {serie.photos.map((photo, index) => (
+              {displayPhotos.map((photo, index) => (
                 <div
-                  key={photo.id}
+                  key={photo.id || `photo-${index}`}
                   onClick={() => setLightboxIndex(index)}
                   className="gallery-item group relative overflow-hidden rounded-sm bg-stone-800 cursor-pointer"
                   style={{ aspectRatio: "4/3" }}
                 >
                   <Image
-                    src={photo.thumb}
+                    src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
                     alt={photo.title}
                     fill
                     sizes="(max-width: 640px) 50vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                     onContextMenu={(e) => e.preventDefault()}
+                    unoptimized={(photo.imageThumb || photo.imageSrc || "").includes("blob.vercel-storage.com")}
                   />
                   <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -103,7 +122,7 @@ function SeriesModal({
                     </p>
                   </div>
                   <div className="absolute top-2 left-2 bg-black/60 text-stone-300 text-xs font-sans px-1.5 py-0.5 rounded-sm">
-                    {index + 1}/{serie.photos.length}
+                    {index + 1}/{displayPhotos.length}
                   </div>
                 </div>
               ))}
@@ -120,10 +139,11 @@ function SeriesModal({
                 </p>
               </div>
               <a
-                href={buildWhatsAppLink(serie.title)}
+                href={buildWhatsAppUrl(tenant.whatsappNumber, serie.title)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm transition-colors duration-200 whitespace-nowrap"
+                className="shrink-0 inline-flex items-center gap-2 text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm transition-colors duration-200 whitespace-nowrap"
+                style={{ backgroundColor: tenant.colorCta }}
               >
                 <WhatsAppIcon size={16} />
                 Adquirir via WhatsApp
@@ -135,6 +155,7 @@ function SeriesModal({
 
       {/* Lightbox dentro do modal */}
       <Lightbox
+        key="series-lightbox"
         open={lightboxIndex >= 0}
         close={() => setLightboxIndex(-1)}
         index={lightboxIndex}
@@ -144,22 +165,25 @@ function SeriesModal({
         render={{
           slideFooter: ({ slide }) => {
             const idx = slides.findIndex((s) => s.src === slide.src);
-            const photo = serie.photos[idx];
+            const photo = displayPhotos[idx];
             if (!photo) return null;
             return (
               <div className="flex items-center justify-between gap-4 px-4 py-3 bg-stone-950/90 border-t border-stone-800">
                 <div>
                   <p className="font-serif text-white text-base font-medium">{photo.title}</p>
-                  <p className="font-sans text-stone-400 text-xs flex items-center gap-3 mt-0.5">
-                    <span className="flex items-center gap-1"><MapPin size={11} />{photo.location}</span>
-                    <span className="flex items-center gap-1"><Calendar size={11} />{photo.year}</span>
-                  </p>
+                  {(photo.location || photo.year) && (
+                    <p className="font-sans text-stone-400 text-xs flex items-center gap-3 mt-0.5">
+                      {photo.location && <span className="flex items-center gap-1"><MapPin size={11} />{photo.location}</span>}
+                      {photo.year && <span className="flex items-center gap-1"><Calendar size={11} />{photo.year}</span>}
+                    </p>
+                  )}
                 </div>
                 <a
-                  href={buildWhatsAppLink(`${photo.title} (série ${serie.title})`)}
+                  href={buildWhatsAppUrl(tenant.whatsappNumber, `${photo.title} (série ${serie.title})`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans text-xs font-semibold px-4 py-2 rounded-sm transition-colors"
+                  className="shrink-0 inline-flex items-center gap-1.5 text-white font-sans text-xs font-semibold px-4 py-2 rounded-sm transition-colors"
+                  style={{ backgroundColor: tenant.colorCta }}
                   onClick={(e) => e.stopPropagation()}
                 >
                   <WhatsAppIcon size={13} />
@@ -184,14 +208,15 @@ const cardVariants: Variants = {
 };
 
 export default function SeriesGallery() {
-  const [selectedSeries, setSelectedSeries] = useState<PhotoSeries | null>(null);
+  const tenant = useTenant();
+  const [selectedSeries, setSelectedSeries] = useState<TenantSeries | null>(null);
 
   return (
     <section id="series" className="py-20 md:py-28 bg-stone-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <span className="inline-block font-sans text-red-700 text-xs uppercase tracking-[0.25em] font-semibold mb-3">
+          <span className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3" style={{ color: tenant.colorPrimary }}>
             Séries
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
@@ -202,14 +227,14 @@ export default function SeriesGallery() {
             geometria urbana ou as texturas do tempo. Cada série é uma imersão poética, disponível
             em impressões avulsas ou como coleção para ambientes que pedem uma história visual coesa.
           </p>
-          <div className="w-12 h-0.5 bg-red-700 mx-auto mt-6" />
+          <div className="w-12 h-0.5 mx-auto mt-6" style={{ backgroundColor: tenant.colorPrimary }} />
         </div>
 
         {/* Series Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8">
-          {series.map((serie, index) => (
+          {tenant.series.map((serie, index) => (
             <motion.div
-              key={serie.slug}
+              key={serie.id || serie.slug || `serie-${index}`}
               custom={index}
               variants={cardVariants}
               initial="hidden"
@@ -219,15 +244,22 @@ export default function SeriesGallery() {
               className="group cursor-pointer bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-stone-100"
             >
               {/* Cover Image */}
-              <div className="relative overflow-hidden" style={{ aspectRatio: "16/9" }}>
-                <Image
-                  src={serie.cover}
-                  alt={serie.title}
-                  fill
-                  sizes="(max-width: 640px) 100vw, 50vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  onContextMenu={(e) => e.preventDefault()}
-                />
+              <div className="relative overflow-hidden bg-stone-200" style={{ aspectRatio: "16/9" }}>
+                {serie.cover ? (
+                  <Image
+                    src={serie.cover}
+                    alt={serie.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    onContextMenu={(e) => e.preventDefault()}
+                    unoptimized={serie.cover.includes("blob.vercel-storage.com")}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center text-stone-400">
+                    <Images className="h-16 w-16 opacity-50" />
+                  </div>
+                )}
                 <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
                 {/* Photo count badge */}
                 <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm text-white text-xs font-sans px-2.5 py-1 rounded-sm">
@@ -254,7 +286,7 @@ export default function SeriesGallery() {
                   <span className="font-sans text-stone-400 text-xs">
                     Clique para explorar
                   </span>
-                  <span className="flex items-center gap-1 font-sans text-red-700 text-sm font-medium group-hover:gap-2 transition-all duration-200">
+                  <span className="flex items-center gap-1 font-sans text-sm font-medium group-hover:gap-2 transition-all duration-200" style={{ color: tenant.colorPrimary }}>
                     Ver série
                     <ChevronRight size={15} />
                   </span>
@@ -270,6 +302,7 @@ export default function SeriesGallery() {
         {selectedSeries && (
           <SeriesModal
             serie={selectedSeries}
+            tenant={tenant}
             onClose={() => setSelectedSeries(null)}
           />
         )}

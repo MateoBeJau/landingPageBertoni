@@ -8,61 +8,59 @@ import "yet-another-react-lightbox/styles.css";
 import { motion, Variants } from "framer-motion";
 import { MapPin, Calendar, ExternalLink } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
-import { photos, Photo } from "@/data/photos";
-import { buildWhatsAppLink } from "@/utils/whatsapp";
+import { useTenant } from "@/components/TenantProvider";
+import type { TenantPhoto } from "@/lib/types";
 
-const categories = [
-  "Todas",
-  "Paisagens",
-  "Urbano & Arquitetura",
-  "Natureza",
-  "Abstrato & Experimental",
-  "Documental",
-  "Artístico & Conceitual",
-  "Detalhes & Texturas",
-  "Sazonal & Temático",
-];
+function PhotoSlideFooter({
+  photo,
+  whatsappNumber,
+  basePath = "",
+}: {
+  photo: TenantPhoto;
+  whatsappNumber: string;
+  basePath?: string;
+}) {
+  const whatsappMessage = `Olá, tenho interesse na foto "${photo.title}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`;
+  const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
-function PhotoSlideFooter({ photo }: { photo: Photo }) {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 px-4 py-4 bg-stone-950/90 backdrop-blur-sm border-t border-stone-800">
-      <div className="flex flex-col gap-1">
-        <h3 className="font-serif text-white text-lg font-semibold">{photo.title}</h3>
-        <div className="flex items-center gap-4 text-stone-400 text-sm font-sans">
-          <span className="flex items-center gap-1.5">
-            <MapPin size={13} />
-            {photo.location}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Calendar size={13} />
-            {photo.year}
-          </span>
+    <div className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-t from-black/95 via-black/80 to-transparent sm:bg-stone-950/90 sm:backdrop-blur-sm sm:border-t sm:border-stone-800">
+      <div className="flex items-center justify-between gap-2 sm:gap-3">
+        <div className="min-w-0 flex-1">
+          <h3 className="font-serif text-white text-sm sm:text-lg font-semibold truncate">{photo.title}</h3>
+          <div className="flex items-center gap-2 sm:gap-3 text-stone-400 text-[11px] sm:text-sm font-sans">
+            <span className="flex items-center gap-1">
+              <MapPin size={11} />
+              {photo.location}
+            </span>
+            <span className="flex items-center gap-1">
+              <Calendar size={11} />
+              {photo.year}
+            </span>
+          </div>
         </div>
-        {photo.description && (
-          <p className="text-stone-400 text-sm font-sans mt-1 max-w-lg leading-relaxed hidden sm:block">
-            {photo.description}
-          </p>
-        )}
-      </div>
-      <div className="flex items-center gap-2 shrink-0">
-        <Link
-          href={`/foto/${photo.id}`}
-          className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-sans font-medium text-sm px-4 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap border border-white/20"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <ExternalLink size={14} />
-          Ver detalhes
-        </Link>
-        <a
-          href={buildWhatsAppLink(photo.title)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-5 py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <WhatsAppIcon size={15} />
-          Consultar
-        </a>
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <Link
+            href={`${basePath}/foto/${photo.slug}`}
+            className="inline-flex items-center gap-1 bg-white/10 hover:bg-white/20 text-white font-sans font-medium text-[11px] sm:text-sm px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap border border-white/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLink size={12} />
+            <span className="hidden sm:inline">Ver detalhes</span>
+            <span className="sm:hidden">Ver</span>
+          </Link>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-[11px] sm:text-sm px-2.5 sm:px-5 py-1.5 sm:py-2.5 rounded-sm transition-colors duration-200 whitespace-nowrap"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <WhatsAppIcon size={13} />
+            <span className="hidden sm:inline">Consultar</span>
+            <span className="sm:hidden">WA</span>
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -79,25 +77,38 @@ const itemVariants: Variants = {
 };
 
 export default function IndividualGallery() {
+  const tenant = useTenant();
   const [lightboxIndex, setLightboxIndex] = useState(-1);
-  const [activeCategory, setActiveCategory] = useState("Todos");
+  const categoryList = (tenant.categories.length > 0 ? tenant.categories : [])
+    .filter((c) => c !== "Todas");
+  const categories = ["Todas", ...categoryList];
+  const [activeCategory, setActiveCategory] = useState("Todas");
 
   const filtered =
     activeCategory === "Todas"
-      ? photos
-      : photos.filter((p) => p.category === activeCategory);
+      ? tenant.photos
+      : tenant.photos.filter((p) => p.category === activeCategory);
 
-  const slides = filtered.map((p) => ({
-    src: p.src,
-    alt: p.title,
-  }));
+  const slides = filtered
+    .filter((p) => p.imageSrc || p.imageThumb)
+    .map((p) => ({
+      src: p.imageSrc || p.imageThumb,
+      alt: p.title,
+    }));
+
+  const whatsappGenericMessage =
+    "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.";
+  const whatsappGenericHref = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(whatsappGenericMessage)}`;
 
   return (
     <section id="foto-unica" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <span className="inline-block font-sans text-red-700 text-xs uppercase tracking-[0.25em] font-semibold mb-3">
+          <span
+            className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
+            style={{ color: tenant.colorPrimary }}
+          >
             Portfólio
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
@@ -112,7 +123,10 @@ export default function IndividualGallery() {
             Disponíveis em diferentes formatos, tamanhos e suportes com qualidade premium — papel
             fine art, canvas ou papel fotográfico.
           </p>
-          <div className="w-12 h-0.5 bg-red-700 mx-auto mt-6" />
+          <div
+            className="w-12 h-0.5 mx-auto mt-6"
+            style={{ backgroundColor: tenant.colorPrimary }}
+          />
         </div>
 
         {/* Category Filter */}
@@ -150,7 +164,7 @@ export default function IndividualGallery() {
               style={{ aspectRatio: "4/3" }}
             >
               <Image
-                src={photo.thumb}
+                src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
                 alt={photo.title}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -184,10 +198,11 @@ export default function IndividualGallery() {
             Valores e formatos combinados diretamente via WhatsApp
           </p>
           <a
-            href={buildWhatsAppLink()}
+            href={whatsappGenericHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm tracking-wide transition-colors duration-200"
+            className="inline-flex items-center gap-2 text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm tracking-wide transition-colors duration-200"
+            style={{ backgroundColor: tenant.colorCta }}
           >
             <WhatsAppIcon size={15} />
             Consultar Valores
@@ -209,7 +224,13 @@ export default function IndividualGallery() {
             const idx = slides.findIndex((s) => s.src === slide.src);
             const photo = filtered[idx];
             if (!photo) return null;
-            return <PhotoSlideFooter photo={photo} />;
+            return (
+              <PhotoSlideFooter
+                photo={photo}
+                whatsappNumber={tenant.whatsappNumber}
+                basePath={tenant.basePath || ""}
+              />
+            );
           },
         }}
         styles={{

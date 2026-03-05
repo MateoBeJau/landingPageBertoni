@@ -1,15 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const stats = [
-  { value: "—", label: "Foto Única" },
-  { value: "—", label: "Série" },
-  { value: "—", label: "Ensaios" },
-  { value: "—", label: "Exposições" },
-];
+import { useTenant } from "@/components/TenantProvider";
 
 export default function StatsStrip() {
+  const tenant = useTenant();
+  const stats = tenant.stats;
+
   return (
     <div className="bg-stone-950 border-y border-stone-800 py-8 md:py-10">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

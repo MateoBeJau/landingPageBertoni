@@ -1,9 +1,13 @@
+"use client";
+
 import Image from "next/image";
-import { buildWhatsAppLink } from "@/utils/whatsapp";
+import { useTenant } from "@/components/TenantProvider";
 import { ChevronDown } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 
 export default function HeroSection() {
+  const tenant = useTenant();
+
   return (
     <section
       id="inicio"
@@ -12,7 +16,7 @@ export default function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=2000&q=85"
+          src={tenant.heroImage}
           alt="Paisagem do pampa gaúcho ao entardecer"
           fill
           className="object-cover protected-image"
@@ -28,28 +32,28 @@ export default function HeroSection() {
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-left pt-20">
         <div className="max-w-3xl">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-red-700/90 text-white text-xs font-sans uppercase tracking-[0.2em] px-4 py-1.5 rounded-sm mb-6 md:mb-8">
+          <div
+            className="inline-flex items-center gap-2 text-white text-xs font-sans uppercase tracking-[0.2em] px-4 py-1.5 rounded-sm mb-6 md:mb-8"
+            style={{ backgroundColor: `${tenant.colorPrimary}E6` }}
+          >
             <span className="w-1.5 h-1.5 bg-white rounded-full" />
-            Fotógrafo Profissional · RS & Brasil
+            {tenant.heroBadge}
           </div>
 
           {/* Headline */}
           <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-semibold leading-tight mb-4 md:mb-6">
-            Um olhar poético{" "}
-            <br className="hidden sm:block" />
-            <span className="text-stone-300">sobre o mundo</span>
+            {tenant.heroTitle}
           </h1>
 
           {/* Subtext */}
           <p className="font-sans text-stone-300 text-base sm:text-lg md:text-xl leading-relaxed mb-8 md:mb-10 max-w-2xl mx-auto md:mx-0">
-            Imagens que atravessam culturas, paisagens e emoções. Fotografia
-            autoral para quem busca beleza e originalidade na decoração.
+            {tenant.heroSubtitle}
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start">
             <a
-              href={buildWhatsAppLink()}
+              href={`https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent("Olá! Gostaria de saber mais sobre o seu trabalho fotográfico.")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm tracking-wide transition-all duration-200 shadow-lg shadow-green-900/30 hover:shadow-xl hover:shadow-green-900/40 hover:-translate-y-0.5"

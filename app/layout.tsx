@@ -15,23 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Álvaro Bertoni Fotografia | Rio Grande do Sul e Brasil",
-  description:
-    "Portfólio de fotografia artística e comercial de Álvaro Bertoni. Paisagens do pampa gaúcho, litoral, serra e retratos do Brasil. Adquira impressões de alta qualidade via WhatsApp.",
-  keywords: [
-    "fotografia gaúcha",
-    "fotógrafo Rio Grande do Sul",
-    "pampa gaúcho",
-    "fotografia artística",
-    "impressões fotográficas",
-    "portfólio fotografia",
-  ],
-  openGraph: {
-    title: "Álvaro Bertoni Fotografia",
-    description: "Registrando a alma do Rio Grande do Sul e do Brasil",
-    type: "website",
-    locale: "pt_BR",
-  },
+  title: "Fotografia Profissional",
+  description: "Fotografia autoral para impressão, coleção e decoração.",
 };
 
 export default function RootLayout({

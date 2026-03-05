@@ -4,10 +4,15 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
-import { buildWhatsAppLink } from "@/utils/whatsapp";
+import { useTenant } from "@/components/TenantProvider";
 
 export default function WhatsAppButton() {
+  const tenant = useTenant();
   const [showTooltip, setShowTooltip] = useState(false);
+  const firstName = tenant.name.split(" ")[0];
+  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
+    "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
+  )}`;
 
   return (
     <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
@@ -23,7 +28,7 @@ export default function WhatsAppButton() {
           >
             <div className="flex items-start justify-between gap-2 mb-2">
               <p className="font-sans font-semibold text-stone-900 text-sm">
-                Fale com Álvaro
+                Fale com {firstName}
               </p>
               <button
                 onClick={() => setShowTooltip(false)}
@@ -38,7 +43,7 @@ export default function WhatsAppButton() {
               rápida!
             </p>
             <a
-              href={buildWhatsAppLink()}
+              href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-xs px-3 py-2.5 rounded-sm transition-colors duration-200"
