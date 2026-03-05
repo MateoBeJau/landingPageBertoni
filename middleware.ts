@@ -25,7 +25,9 @@ export function middleware(request: NextRequest) {
   const response = NextResponse.next();
   response.headers.set("x-tenant-host", hostname);
 
-  // Platform landing: path "/" + host es plataforma. En localhost, ?tenant= override para dev.
+  // Platform landing: path "/" + host es plataforma.
+  // ?tenant= en URL → siempre mostrar tenant (usuario lo pidió explícitamente).
+  // Cookie: en localhost afecta; en producción la ignoramos para que / muestre plataforma.
   const platformDomains = (
     process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ||
     process.env.NEXT_PUBLIC_PLATFORM_DOMAINS ||
@@ -35,9 +37,13 @@ export function middleware(request: NextRequest) {
     .map((d) => d.trim().toLowerCase())
     .filter(Boolean);
   const isPlatformDomain = platformDomains.some((d) => requestHost === d);
-  const hasTenantOverride = (slugParam && slugParam !== "" && slugParam !== "clear") || (slugFromCookie && slugFromCookie !== "");
-  // En producción (no localhost), la raíz siempre muestra plataforma. Cookie solo afecta en localhost.
-  const showPlatform = url.pathname === "/" && isPlatformDomain && (requestHost === "localhost" ? !hasTenantOverride : true);
+  const hasExplicitTenantParam = slugParam && slugParam !== "" && slugParam !== "clear";
+  const hasTenantCookie = slugFromCookie && slugFromCookie !== "";
+  const showPlatform =
+    url.pathname === "/" &&
+    isPlatformDomain &&
+    !hasExplicitTenantParam && // ?tenant= en URL → mostrar tenant
+    (requestHost === "localhost" ? !hasTenantCookie : true); // en prod, cookie no afecta
   if (showPlatform) {
     response.headers.set("x-platform-root", "1");
   }
