@@ -94,6 +94,34 @@ type Tenant = {
   active: boolean;
   photos: Photo[];
   users: TenantUser[];
+  sectionFotoUnicaBadge?: string | null;
+  sectionFotoUnicaTitle?: string | null;
+  sectionFotoUnicaDesc?: string | null;
+  sectionFotoUnicaDesc2?: string | null;
+  sectionFotoUnicaCta?: string | null;
+  sectionFotoUnicaSubtext?: string | null;
+  sectionSeriesBadge?: string | null;
+  sectionSeriesTitle?: string | null;
+  sectionSeriesDesc?: string | null;
+  sectionSeriesModalLabel?: string | null;
+  sectionSeriesVerSerie?: string | null;
+  sectionSeriesClique?: string | null;
+  sectionEnsaiosBadge?: string | null;
+  sectionEnsaiosTitle?: string | null;
+  sectionEnsaiosDesc?: string | null;
+  sectionEnsaiosCta?: string | null;
+  sectionEnsaiosCtaSubtext?: string | null;
+  heroCtaWhatsApp?: string | null;
+  heroCtaPortfolio?: string | null;
+  heroScrollLabel?: string | null;
+  contactCta?: string | null;
+  contactSubtext?: string | null;
+  aboutSectionLabel?: string | null;
+  aboutYears?: string | null;
+  aboutYearsLabel?: string | null;
+  aboutCtaContact?: string | null;
+  aboutCtaPortfolio?: string | null;
+  aboutHighlights?: Array<{ label: string; desc: string }> | null;
 };
 
 const inputClass =
@@ -371,6 +399,34 @@ export default function TenantEditorPage({
       facebookUrl: t.facebookUrl ?? "",
       metaTitle: t.metaTitle ?? "",
       metaDescription: t.metaDescription ?? "",
+      sectionFotoUnicaBadge: t.sectionFotoUnicaBadge ?? "",
+      sectionFotoUnicaTitle: t.sectionFotoUnicaTitle ?? "",
+      sectionFotoUnicaDesc: t.sectionFotoUnicaDesc ?? "",
+      sectionFotoUnicaDesc2: t.sectionFotoUnicaDesc2 ?? "",
+      sectionFotoUnicaCta: t.sectionFotoUnicaCta ?? "",
+      sectionFotoUnicaSubtext: t.sectionFotoUnicaSubtext ?? "",
+      sectionSeriesBadge: t.sectionSeriesBadge ?? "",
+      sectionSeriesTitle: t.sectionSeriesTitle ?? "",
+      sectionSeriesDesc: t.sectionSeriesDesc ?? "",
+      sectionSeriesModalLabel: t.sectionSeriesModalLabel ?? "",
+      sectionSeriesVerSerie: t.sectionSeriesVerSerie ?? "",
+      sectionSeriesClique: t.sectionSeriesClique ?? "",
+      sectionEnsaiosBadge: t.sectionEnsaiosBadge ?? "",
+      sectionEnsaiosTitle: t.sectionEnsaiosTitle ?? "",
+      sectionEnsaiosDesc: t.sectionEnsaiosDesc ?? "",
+      sectionEnsaiosCta: t.sectionEnsaiosCta ?? "",
+      sectionEnsaiosCtaSubtext: t.sectionEnsaiosCtaSubtext ?? "",
+      heroCtaWhatsApp: t.heroCtaWhatsApp ?? "",
+      heroCtaPortfolio: t.heroCtaPortfolio ?? "",
+      heroScrollLabel: t.heroScrollLabel ?? "",
+      contactCta: t.contactCta ?? "",
+      contactSubtext: t.contactSubtext ?? "",
+      aboutSectionLabel: t.aboutSectionLabel ?? "",
+      aboutYears: t.aboutYears ?? "",
+      aboutYearsLabel: t.aboutYearsLabel ?? "",
+      aboutCtaContact: t.aboutCtaContact ?? "",
+      aboutCtaPortfolio: t.aboutCtaPortfolio ?? "",
+      aboutHighlights: t.aboutHighlights ?? null,
     });
   }, [id]);
 
@@ -411,7 +467,35 @@ export default function TenantEditorPage({
       (form.instagramUrl ?? "") !== (t.instagramUrl ?? "") ||
       (form.facebookUrl ?? "") !== (t.facebookUrl ?? "") ||
       (form.metaTitle ?? "") !== (t.metaTitle ?? "") ||
-      (form.metaDescription ?? "") !== (t.metaDescription ?? "")
+      (form.metaDescription ?? "") !== (t.metaDescription ?? "") ||
+      (form.sectionFotoUnicaBadge ?? "") !== (t.sectionFotoUnicaBadge ?? "") ||
+      (form.sectionFotoUnicaTitle ?? "") !== (t.sectionFotoUnicaTitle ?? "") ||
+      (form.sectionFotoUnicaDesc ?? "") !== (t.sectionFotoUnicaDesc ?? "") ||
+      (form.sectionFotoUnicaDesc2 ?? "") !== (t.sectionFotoUnicaDesc2 ?? "") ||
+      (form.sectionFotoUnicaCta ?? "") !== (t.sectionFotoUnicaCta ?? "") ||
+      (form.sectionFotoUnicaSubtext ?? "") !== (t.sectionFotoUnicaSubtext ?? "") ||
+      (form.sectionSeriesBadge ?? "") !== (t.sectionSeriesBadge ?? "") ||
+      (form.sectionSeriesTitle ?? "") !== (t.sectionSeriesTitle ?? "") ||
+      (form.sectionSeriesDesc ?? "") !== (t.sectionSeriesDesc ?? "") ||
+      (form.sectionSeriesModalLabel ?? "") !== (t.sectionSeriesModalLabel ?? "") ||
+      (form.sectionSeriesVerSerie ?? "") !== (t.sectionSeriesVerSerie ?? "") ||
+      (form.sectionSeriesClique ?? "") !== (t.sectionSeriesClique ?? "") ||
+      (form.sectionEnsaiosBadge ?? "") !== (t.sectionEnsaiosBadge ?? "") ||
+      (form.sectionEnsaiosTitle ?? "") !== (t.sectionEnsaiosTitle ?? "") ||
+      (form.sectionEnsaiosDesc ?? "") !== (t.sectionEnsaiosDesc ?? "") ||
+      (form.sectionEnsaiosCta ?? "") !== (t.sectionEnsaiosCta ?? "") ||
+      (form.sectionEnsaiosCtaSubtext ?? "") !== (t.sectionEnsaiosCtaSubtext ?? "") ||
+      (form.heroCtaWhatsApp ?? "") !== (t.heroCtaWhatsApp ?? "") ||
+      (form.heroCtaPortfolio ?? "") !== (t.heroCtaPortfolio ?? "") ||
+      (form.heroScrollLabel ?? "") !== (t.heroScrollLabel ?? "") ||
+      (form.contactCta ?? "") !== (t.contactCta ?? "") ||
+      (form.contactSubtext ?? "") !== (t.contactSubtext ?? "") ||
+      (form.aboutSectionLabel ?? "") !== (t.aboutSectionLabel ?? "") ||
+      (form.aboutYears ?? "") !== (t.aboutYears ?? "") ||
+      (form.aboutYearsLabel ?? "") !== (t.aboutYearsLabel ?? "") ||
+      (form.aboutCtaContact ?? "") !== (t.aboutCtaContact ?? "") ||
+      (form.aboutCtaPortfolio ?? "") !== (t.aboutCtaPortfolio ?? "") ||
+      JSON.stringify(form.aboutHighlights ?? null) !== JSON.stringify(t.aboutHighlights ?? null)
     );
   }, [tenant, form]);
 
@@ -469,6 +553,34 @@ export default function TenantEditorPage({
         facebookUrl: t.facebookUrl ?? "",
         metaTitle: t.metaTitle ?? "",
         metaDescription: t.metaDescription ?? "",
+        sectionFotoUnicaBadge: t.sectionFotoUnicaBadge ?? "",
+        sectionFotoUnicaTitle: t.sectionFotoUnicaTitle ?? "",
+        sectionFotoUnicaDesc: t.sectionFotoUnicaDesc ?? "",
+        sectionFotoUnicaDesc2: t.sectionFotoUnicaDesc2 ?? "",
+        sectionFotoUnicaCta: t.sectionFotoUnicaCta ?? "",
+        sectionFotoUnicaSubtext: t.sectionFotoUnicaSubtext ?? "",
+        sectionSeriesBadge: t.sectionSeriesBadge ?? "",
+        sectionSeriesTitle: t.sectionSeriesTitle ?? "",
+        sectionSeriesDesc: t.sectionSeriesDesc ?? "",
+        sectionSeriesModalLabel: t.sectionSeriesModalLabel ?? "",
+        sectionSeriesVerSerie: t.sectionSeriesVerSerie ?? "",
+        sectionSeriesClique: t.sectionSeriesClique ?? "",
+        sectionEnsaiosBadge: t.sectionEnsaiosBadge ?? "",
+        sectionEnsaiosTitle: t.sectionEnsaiosTitle ?? "",
+        sectionEnsaiosDesc: t.sectionEnsaiosDesc ?? "",
+        sectionEnsaiosCta: t.sectionEnsaiosCta ?? "",
+        sectionEnsaiosCtaSubtext: t.sectionEnsaiosCtaSubtext ?? "",
+        heroCtaWhatsApp: t.heroCtaWhatsApp ?? "",
+        heroCtaPortfolio: t.heroCtaPortfolio ?? "",
+        heroScrollLabel: t.heroScrollLabel ?? "",
+        contactCta: t.contactCta ?? "",
+        contactSubtext: t.contactSubtext ?? "",
+        aboutSectionLabel: t.aboutSectionLabel ?? "",
+        aboutYears: t.aboutYears ?? "",
+        aboutYearsLabel: t.aboutYearsLabel ?? "",
+        aboutCtaContact: t.aboutCtaContact ?? "",
+        aboutCtaPortfolio: t.aboutCtaPortfolio ?? "",
+        aboutHighlights: t.aboutHighlights ?? null,
       });
       setLoading(false);
     }
@@ -534,6 +646,34 @@ export default function TenantEditorPage({
           facebookUrl: form.facebookUrl || null,
           metaTitle: form.metaTitle || null,
           metaDescription: form.metaDescription || null,
+          sectionFotoUnicaBadge: form.sectionFotoUnicaBadge || null,
+          sectionFotoUnicaTitle: form.sectionFotoUnicaTitle || null,
+          sectionFotoUnicaDesc: form.sectionFotoUnicaDesc || null,
+          sectionFotoUnicaDesc2: form.sectionFotoUnicaDesc2 || null,
+          sectionFotoUnicaCta: form.sectionFotoUnicaCta || null,
+          sectionFotoUnicaSubtext: form.sectionFotoUnicaSubtext || null,
+          sectionSeriesBadge: form.sectionSeriesBadge || null,
+          sectionSeriesTitle: form.sectionSeriesTitle || null,
+          sectionSeriesDesc: form.sectionSeriesDesc || null,
+          sectionSeriesModalLabel: form.sectionSeriesModalLabel || null,
+          sectionSeriesVerSerie: form.sectionSeriesVerSerie || null,
+          sectionSeriesClique: form.sectionSeriesClique || null,
+          sectionEnsaiosBadge: form.sectionEnsaiosBadge || null,
+          sectionEnsaiosTitle: form.sectionEnsaiosTitle || null,
+          sectionEnsaiosDesc: form.sectionEnsaiosDesc || null,
+          sectionEnsaiosCta: form.sectionEnsaiosCta || null,
+          sectionEnsaiosCtaSubtext: form.sectionEnsaiosCtaSubtext || null,
+          heroCtaWhatsApp: form.heroCtaWhatsApp || null,
+          heroCtaPortfolio: form.heroCtaPortfolio || null,
+          heroScrollLabel: form.heroScrollLabel || null,
+          contactCta: form.contactCta || null,
+          contactSubtext: form.contactSubtext || null,
+          aboutSectionLabel: form.aboutSectionLabel || null,
+          aboutYears: form.aboutYears || null,
+          aboutYearsLabel: form.aboutYearsLabel || null,
+          aboutCtaContact: form.aboutCtaContact || null,
+          aboutCtaPortfolio: form.aboutCtaPortfolio || null,
+          aboutHighlights: form.aboutHighlights || null,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -1398,6 +1538,306 @@ export default function TenantEditorPage({
                     }
                     className={inputClass}
                     rows={4}
+                  />
+                </FieldRow>
+                <FieldRow label="Botão CTA">
+                  <input
+                    type="text"
+                    value={form.contactCta ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, contactCta: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="SOLICITAR ORÇAMENTO"
+                  />
+                </FieldRow>
+                <FieldRow label="Texto bajo botón">
+                  <input
+                    type="text"
+                    value={form.contactSubtext ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, contactSubtext: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Valores e formas de pagamento..."
+                  />
+                </FieldRow>
+              </Section>
+
+              <Section title="Textos das seções" icon={FileText}>
+                <FieldRow label="Hero: Botón WhatsApp">
+                  <input
+                    type="text"
+                    value={form.heroCtaWhatsApp ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, heroCtaWhatsApp: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Fale pelo WhatsApp"
+                  />
+                </FieldRow>
+                <FieldRow label="Hero: Botón Portfólio">
+                  <input
+                    type="text"
+                    value={form.heroCtaPortfolio ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, heroCtaPortfolio: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Ver Portfólio"
+                  />
+                </FieldRow>
+                <FieldRow label="Hero: Indicador scroll">
+                  <input
+                    type="text"
+                    value={form.heroScrollLabel ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, heroScrollLabel: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Rolar"
+                  />
+                </FieldRow>
+                <FieldRow label="Sobre: Etiqueta sección">
+                  <input
+                    type="text"
+                    value={form.aboutSectionLabel ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, aboutSectionLabel: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Sobre o Fotógrafo"
+                  />
+                </FieldRow>
+                <FieldRow label="Sobre: Años (ej. 15+)">
+                  <input
+                    type="text"
+                    value={form.aboutYears ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, aboutYears: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="15+"
+                  />
+                </FieldRow>
+                <FieldRow label="Sobre: Label años">
+                  <input
+                    type="text"
+                    value={form.aboutYearsLabel ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, aboutYearsLabel: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Anos fotografando"
+                  />
+                </FieldRow>
+                <FieldRow label="Sobre: Botón Contacto">
+                  <input
+                    type="text"
+                    value={form.aboutCtaContact ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, aboutCtaContact: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Entrar em Contato"
+                  />
+                </FieldRow>
+                <FieldRow label="Sobre: Botón Portfólio">
+                  <input
+                    type="text"
+                    value={form.aboutCtaPortfolio ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, aboutCtaPortfolio: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Ver Portfólio"
+                  />
+                </FieldRow>
+                <FieldRow label="Foto Única: Badge">
+                  <input
+                    type="text"
+                    value={form.sectionFotoUnicaBadge ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionFotoUnicaBadge: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Portfólio"
+                  />
+                </FieldRow>
+                <FieldRow label="Foto Única: Título">
+                  <input
+                    type="text"
+                    value={form.sectionFotoUnicaTitle ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionFotoUnicaTitle: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Foto Única"
+                  />
+                </FieldRow>
+                <FieldRow label="Foto Única: Descripción">
+                  <textarea
+                    value={form.sectionFotoUnicaDesc ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionFotoUnicaDesc: e.target.value })
+                    }
+                    className={inputClass}
+                    rows={3}
+                    placeholder="Cada imagem carrega um instante decisivo..."
+                  />
+                </FieldRow>
+                <FieldRow label="Foto Única: Descripción 2">
+                  <textarea
+                    value={form.sectionFotoUnicaDesc2 ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionFotoUnicaDesc2: e.target.value })
+                    }
+                    className={inputClass}
+                    rows={2}
+                    placeholder="Disponíveis em diferentes formatos..."
+                  />
+                </FieldRow>
+                <FieldRow label="Foto Única: Botón CTA">
+                  <input
+                    type="text"
+                    value={form.sectionFotoUnicaCta ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionFotoUnicaCta: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Consultar Valores"
+                  />
+                </FieldRow>
+                <FieldRow label="Foto Única: Subtexto">
+                  <input
+                    type="text"
+                    value={form.sectionFotoUnicaSubtext ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionFotoUnicaSubtext: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Valores e formatos combinados..."
+                  />
+                </FieldRow>
+                <FieldRow label="Séries: Badge">
+                  <input
+                    type="text"
+                    value={form.sectionSeriesBadge ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionSeriesBadge: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Séries"
+                  />
+                </FieldRow>
+                <FieldRow label="Séries: Título">
+                  <input
+                    type="text"
+                    value={form.sectionSeriesTitle ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionSeriesTitle: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Séries Fotográficas"
+                  />
+                </FieldRow>
+                <FieldRow label="Séries: Descripción">
+                  <textarea
+                    value={form.sectionSeriesDesc ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionSeriesDesc: e.target.value })
+                    }
+                    className={inputClass}
+                    rows={3}
+                    placeholder="Conjuntos de imagens que exploram..."
+                  />
+                </FieldRow>
+                <FieldRow label="Séries: Modal label">
+                  <input
+                    type="text"
+                    value={form.sectionSeriesModalLabel ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionSeriesModalLabel: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Série Fotográfica"
+                  />
+                </FieldRow>
+                <FieldRow label="Séries: Ver série">
+                  <input
+                    type="text"
+                    value={form.sectionSeriesVerSerie ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionSeriesVerSerie: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Ver série"
+                  />
+                </FieldRow>
+                <FieldRow label="Séries: Clique para explorar">
+                  <input
+                    type="text"
+                    value={form.sectionSeriesClique ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionSeriesClique: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Clique para explorar"
+                  />
+                </FieldRow>
+                <FieldRow label="Ensaios: Badge">
+                  <input
+                    type="text"
+                    value={form.sectionEnsaiosBadge ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionEnsaiosBadge: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Ensaios"
+                  />
+                </FieldRow>
+                <FieldRow label="Ensaios: Título">
+                  <input
+                    type="text"
+                    value={form.sectionEnsaiosTitle ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionEnsaiosTitle: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Ensaios Fotográficos"
+                  />
+                </FieldRow>
+                <FieldRow label="Ensaios: Descripción">
+                  <textarea
+                    value={form.sectionEnsaiosDesc ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionEnsaiosDesc: e.target.value })
+                    }
+                    className={inputClass}
+                    rows={3}
+                    placeholder="Imagens que nascem do encontro..."
+                  />
+                </FieldRow>
+                <FieldRow label="Ensaios: Botón CTA">
+                  <input
+                    type="text"
+                    value={form.sectionEnsaiosCta ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionEnsaiosCta: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Agendar Ensaio via WhatsApp"
+                  />
+                </FieldRow>
+                <FieldRow label="Ensaios: Subtexto CTA">
+                  <input
+                    type="text"
+                    value={form.sectionEnsaiosCtaSubtext ?? ""}
+                    onChange={(e) =>
+                      setForm({ ...form, sectionEnsaiosCtaSubtext: e.target.value })
+                    }
+                    className={inputClass}
+                    placeholder="Cada ensaio é único..."
                   />
                 </FieldRow>
               </Section>

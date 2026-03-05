@@ -77,6 +77,36 @@ export interface TenantConfig {
   contactTitle: string;
   contactText: string;
 
+  /** Section texts (optional overrides, fallback to defaults in components) */
+  sectionFotoUnicaBadge?: string | null;
+  sectionFotoUnicaTitle?: string | null;
+  sectionFotoUnicaDesc?: string | null;
+  sectionFotoUnicaDesc2?: string | null;
+  sectionFotoUnicaCta?: string | null;
+  sectionFotoUnicaSubtext?: string | null;
+  sectionSeriesBadge?: string | null;
+  sectionSeriesTitle?: string | null;
+  sectionSeriesDesc?: string | null;
+  sectionSeriesModalLabel?: string | null;
+  sectionSeriesVerSerie?: string | null;
+  sectionSeriesClique?: string | null;
+  sectionEnsaiosBadge?: string | null;
+  sectionEnsaiosTitle?: string | null;
+  sectionEnsaiosDesc?: string | null;
+  sectionEnsaiosCta?: string | null;
+  sectionEnsaiosCtaSubtext?: string | null;
+  heroCtaWhatsApp?: string | null;
+  heroCtaPortfolio?: string | null;
+  heroScrollLabel?: string | null;
+  contactCta?: string | null;
+  contactSubtext?: string | null;
+  aboutSectionLabel?: string | null;
+  aboutYears?: string | null;
+  aboutYearsLabel?: string | null;
+  aboutCtaContact?: string | null;
+  aboutCtaPortfolio?: string | null;
+  aboutHighlights?: Array<{ label: string; desc: string }> | null;
+
   stats: { value: string; label: string }[];
   categories: string[];
 

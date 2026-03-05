@@ -59,13 +59,13 @@ export default function HeroSection() {
               className="inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm tracking-wide transition-all duration-200 shadow-lg shadow-green-900/30 hover:shadow-xl hover:shadow-green-900/40 hover:-translate-y-0.5"
             >
               <WhatsAppIcon size={18} />
-              Fale pelo WhatsApp
+              {tenant.heroCtaWhatsApp || "Fale pelo WhatsApp"}
             </a>
             <a
               href="#foto-unica"
               className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-sans font-medium text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm tracking-wide transition-all duration-200 border border-white/20 hover:border-white/40"
             >
-              Ver Portfólio
+              {tenant.heroCtaPortfolio || "Ver Portfólio"}
             </a>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function HeroSection() {
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-stone-400">
         <span className="font-sans text-xs uppercase tracking-[0.2em]">
-          Rolar
+          {tenant.heroScrollLabel || "Rolar"}
         </span>
         <ChevronDown size={18} className="animate-bounce" />
       </div>

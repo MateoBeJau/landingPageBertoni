@@ -74,6 +74,41 @@ model Tenant {
   // ── Categories (comma-separated for simplicity) ──
   categories String @default("Todas,Paisagens,Natureza,Urbano & Arquitetura,Abstrato & Experimental,Documental,Artístico & Conceitual")
 
+  // ── Section texts (editable by admin/fotógrafo) ──
+  sectionFotoUnicaBadge   String?
+  sectionFotoUnicaTitle    String?
+  sectionFotoUnicaDesc     String?
+  sectionFotoUnicaDesc2    String?
+  sectionFotoUnicaCta      String?
+  sectionFotoUnicaSubtext  String?
+
+  sectionSeriesBadge       String?
+  sectionSeriesTitle       String?
+  sectionSeriesDesc        String?
+  sectionSeriesModalLabel  String?
+  sectionSeriesVerSerie    String?
+  sectionSeriesClique      String?
+
+  sectionEnsaiosBadge     String?
+  sectionEnsaiosTitle      String?
+  sectionEnsaiosDesc       String?
+  sectionEnsaiosCta        String?
+  sectionEnsaiosCtaSubtext String?
+
+  heroCtaWhatsApp         String?
+  heroCtaPortfolio         String?
+  heroScrollLabel          String?
+
+  contactCta              String?
+  contactSubtext           String?
+
+  aboutSectionLabel       String?
+  aboutYears              String?
+  aboutYearsLabel         String?
+  aboutCtaContact         String?
+  aboutCtaPortfolio        String?
+  aboutHighlights         Json? // [{label, desc}, ...]
+
   // ── Limits ──
   maxPhotos Int @default(10)
 

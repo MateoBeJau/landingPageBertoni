@@ -109,19 +109,16 @@ export default function IndividualGallery() {
             className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
             style={{ color: tenant.colorPrimary }}
           >
-            Portfólio
+            {tenant.sectionFotoUnicaBadge || "Portfólio"}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
-            Foto Única
+            {tenant.sectionFotoUnicaTitle || "Foto Única"}
           </h2>
           <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Cada imagem carrega um instante decisivo, uma luz encontrada, uma emoção congelada no
-            tempo. Disponíveis para impressão em fine art, com curadoria de acabamento e suporte sob
-            medida para cada obra.
+            {tenant.sectionFotoUnicaDesc || "Cada imagem carrega um instante decisivo, uma luz encontrada, uma emoção congelada no tempo. Disponíveis para impressão em fine art, com curadoria de acabamento e suporte sob medida para cada obra."}
           </p>
           <p className="font-sans text-stone-400 text-sm max-w-2xl mx-auto leading-relaxed mt-3">
-            Disponíveis em diferentes formatos, tamanhos e suportes com qualidade premium — papel
-            fine art, canvas ou papel fotográfico.
+            {tenant.sectionFotoUnicaDesc2 || "Disponíveis em diferentes formatos, tamanhos e suportes com qualidade premium — papel fine art, canvas ou papel fotográfico."}
           </p>
           <div
             className="w-12 h-0.5 mx-auto mt-6"
@@ -195,7 +192,7 @@ export default function IndividualGallery() {
         {/* Bottom CTA */}
         <div className="text-center mt-12 md:mt-16">
           <p className="font-sans text-stone-500 text-sm mb-4">
-            Valores e formatos combinados diretamente via WhatsApp
+            {tenant.sectionFotoUnicaSubtext || "Valores e formatos combinados diretamente via WhatsApp"}
           </p>
           <a
             href={whatsappGenericHref}
@@ -205,7 +202,7 @@ export default function IndividualGallery() {
             style={{ backgroundColor: tenant.colorCta }}
           >
             <WhatsAppIcon size={15} />
-            Consultar Valores
+            {tenant.sectionFotoUnicaCta || "Consultar Valores"}
           </a>
         </div>
       </div>

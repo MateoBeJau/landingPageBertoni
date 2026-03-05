@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { getTenantFromHeaders } from "@/lib/tenant";
 import { TenantProvider } from "@/components/TenantProvider";
+import PlatformLanding from "@/components/PlatformLanding";
 
 export default async function TenantLayout({
   children,
@@ -8,6 +9,12 @@ export default async function TenantLayout({
   children: React.ReactNode;
 }) {
   const headersList = await headers();
+  const isPlatformRoot = headersList.get("x-platform-root") === "1";
+
+  if (isPlatformRoot) {
+    return <PlatformLanding />;
+  }
+
   const tenant = await getTenantFromHeaders(headersList);
   const pathSlug = headersList.get("x-tenant-slug");
   const tenantWithPath = tenant

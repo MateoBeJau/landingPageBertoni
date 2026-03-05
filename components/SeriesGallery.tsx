@@ -70,7 +70,7 @@ function SeriesModal({
             <div className="flex items-start justify-between mb-8 pt-4">
               <div>
                 <p className="font-sans text-xs uppercase tracking-[0.2em] mb-1" style={{ color: tenant.colorPrimary }}>
-                  Série Fotográfica
+                  {tenant.sectionSeriesModalLabel || "Série Fotográfica"}
                 </p>
                 <h2 className="font-serif text-white text-2xl sm:text-3xl md:text-4xl font-semibold">
                   {serie.title}
@@ -217,15 +217,13 @@ export default function SeriesGallery() {
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
           <span className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3" style={{ color: tenant.colorPrimary }}>
-            Séries
+            {tenant.sectionSeriesBadge || "Séries"}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
-            Séries Fotográficas
+            {tenant.sectionSeriesTitle || "Séries Fotográficas"}
           </h2>
           <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Conjuntos de imagens que exploram um tema em profundidade — seja a luz de um lugar, a
-            geometria urbana ou as texturas do tempo. Cada série é uma imersão poética, disponível
-            em impressões avulsas ou como coleção para ambientes que pedem uma história visual coesa.
+            {tenant.sectionSeriesDesc || "Conjuntos de imagens que exploram um tema em profundidade — seja a luz de um lugar, a geometria urbana ou as texturas do tempo. Cada série é uma imersão poética, disponível em impressões avulsas ou como coleção para ambientes que pedem uma história visual coesa."}
           </p>
           <div className="w-12 h-0.5 mx-auto mt-6" style={{ backgroundColor: tenant.colorPrimary }} />
         </div>
@@ -284,10 +282,10 @@ export default function SeriesGallery() {
                 </p>
                 <div className="flex items-center justify-between mt-4">
                   <span className="font-sans text-stone-400 text-xs">
-                    Clique para explorar
+                    {tenant.sectionSeriesClique || "Clique para explorar"}
                   </span>
                   <span className="flex items-center gap-1 font-sans text-sm font-medium group-hover:gap-2 transition-all duration-200" style={{ color: tenant.colorPrimary }}>
-                    Ver série
+                    {tenant.sectionSeriesVerSerie || "Ver série"}
                     <ChevronRight size={15} />
                   </span>
                 </div>

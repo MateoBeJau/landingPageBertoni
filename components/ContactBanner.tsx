@@ -39,12 +39,12 @@ export default function ContactBanner() {
           style={{ backgroundColor: tenant.colorCta }}
         >
           <WhatsAppIcon size={18} />
-          SOLICITAR ORÇAMENTO
+          {tenant.contactCta || "SOLICITAR ORÇAMENTO"}
         </a>
         <div className="flex items-center justify-center gap-2 mt-4 text-orange-200">
           <Shield size={13} />
           <p className="font-sans text-xs">
-            Valores e formas de pagamento combinados diretamente via WhatsApp
+            {tenant.contactSubtext || "Valores e formas de pagamento combinados diretamente via WhatsApp"}
           </p>
         </div>
       </div>

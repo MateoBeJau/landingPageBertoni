@@ -5,7 +5,7 @@ import { Camera, Award, MapPin } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
 
-const highlights = [
+const defaultHighlights = [
   { icon: Camera, label: "15+ anos de experiência", desc: "Fotografando o Sul e o Brasil" },
   { icon: Award, label: "Impressões de alta qualidade", desc: "Papel Fine Art e Canvas" },
   { icon: MapPin, label: "Porto Alegre, RS", desc: "Atendimento em todo o Brasil" },
@@ -13,6 +13,9 @@ const highlights = [
 
 export default function AboutSection() {
   const tenant = useTenant();
+  const highlights = (tenant.aboutHighlights && tenant.aboutHighlights.length >= 3)
+    ? defaultHighlights.map((d, i) => ({ ...d, label: tenant.aboutHighlights![i].label, desc: tenant.aboutHighlights![i].desc }))
+    : defaultHighlights;
   const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
   )}`;
@@ -45,8 +48,8 @@ export default function AboutSection() {
             />
             {/* Experience badge */}
             <div className="absolute bottom-6 left-6 bg-stone-950/95 backdrop-blur-sm border border-stone-800 rounded-sm px-4 py-3">
-              <p className="font-serif text-white text-2xl font-semibold">15+</p>
-              <p className="font-sans text-stone-400 text-xs uppercase tracking-wider">Anos fotografando</p>
+              <p className="font-serif text-white text-2xl font-semibold">{tenant.aboutYears || "15+"}</p>
+              <p className="font-sans text-stone-400 text-xs uppercase tracking-wider">{tenant.aboutYearsLabel || "Anos fotografando"}</p>
             </div>
           </div>
 
@@ -56,7 +59,7 @@ export default function AboutSection() {
               className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
               style={{ color: tenant.colorPrimary }}
             >
-              Sobre o Fotógrafo
+              {tenant.aboutSectionLabel || "Sobre o Fotógrafo"}
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white font-semibold mb-6 leading-tight">
               {tenant.name}
@@ -90,13 +93,13 @@ export default function AboutSection() {
                 style={{ backgroundColor: tenant.colorCta }}
               >
                 <WhatsAppIcon size={16} />
-                Entrar em Contato
+                {tenant.aboutCtaContact || "Entrar em Contato"}
               </a>
               <a
                 href="#foto-unica"
                 className="inline-flex items-center justify-center gap-2 bg-transparent hover:bg-white/10 text-white font-sans font-medium text-sm px-6 py-3.5 rounded-sm tracking-wide transition-colors duration-200 border border-stone-700 hover:border-stone-500"
               >
-                Ver Portfólio
+                {tenant.aboutCtaPortfolio || "Ver Portfólio"}
               </a>
             </div>
           </div>

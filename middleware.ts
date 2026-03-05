@@ -10,6 +10,9 @@ export function middleware(request: NextRequest) {
   const slugParam = url.searchParams.get("tenant")?.trim();
   const slugFromCookie = request.cookies.get(DEV_TENANT_COOKIE)?.value;
 
+  // Guardar host original para detectar plataforma (antes de cookie/param)
+  const requestHost = hostname.replace(/:\d+$/, "").toLowerCase();
+
   if (slugParam === "" || slugParam === "clear") {
     hostname = isLocal ? "localhost" : hostname;
   } else {
@@ -21,6 +24,24 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   response.headers.set("x-tenant-host", hostname);
+
+  // Platform landing: solo cuando path es "/", host es plataforma, y NO hay tenant pedido
+  const hasTenantRequest = (slugParam && slugParam !== "" && slugParam !== "clear") || (slugFromCookie && slugFromCookie !== "");
+  const platformDomains = (
+    process.env.NEXT_PUBLIC_PLATFORM_DOMAIN ||
+    process.env.NEXT_PUBLIC_PLATFORM_DOMAINS ||
+    "localhost"
+  )
+    .split(",")
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
+  if (
+    url.pathname === "/" &&
+    !hasTenantRequest &&
+    platformDomains.some((d) => requestHost === d)
+  ) {
+    response.headers.set("x-platform-root", "1");
+  }
 
   const pathSegments = url.pathname.split("/").filter(Boolean);
   const firstSegment = pathSegments[0];

@@ -35,15 +35,13 @@ export default function EnsaiosSection() {
             className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
             style={{ color: tenant.colorPrimary }}
           >
-            Ensaios
+            {tenant.sectionEnsaiosBadge || "Ensaios"}
           </span>
           <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
-            Ensaios Fotográficos
+            {tenant.sectionEnsaiosTitle || "Ensaios Fotográficos"}
           </h2>
           <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            Imagens que nascem do encontro — retratos, celebrações e histórias transformadas
-            em arte fotográfica. Cada sessão é pensada para documentar ou revelar a beleza
-            genuína de quem se entrega ao olhar da câmera.
+            {tenant.sectionEnsaiosDesc || "Imagens que nascem do encontro — retratos, celebrações e histórias transformadas em arte fotográfica. Cada sessão é pensada para documentar ou revelar a beleza genuína de quem se entrega ao olhar da câmera."}
           </p>
           <div
             className="w-12 h-0.5 mx-auto mt-6"
@@ -119,7 +117,7 @@ export default function EnsaiosSection() {
         {/* Bottom CTA */}
         <div className="text-center mt-12 md:mt-16">
           <p className="font-sans text-stone-500 text-sm mb-4">
-            Cada ensaio é único — entre em contato para conversarmos sobre o seu projeto
+            {tenant.sectionEnsaiosCtaSubtext || "Cada ensaio é único — entre em contato para conversarmos sobre o seu projeto"}
           </p>
           <a
             href={buildWhatsAppUrl(
@@ -132,7 +130,7 @@ export default function EnsaiosSection() {
             style={{ backgroundColor: tenant.colorCta }}
           >
             <WhatsAppIcon size={15} />
-            Agendar Ensaio via WhatsApp
+            {tenant.sectionEnsaiosCta || "Agendar Ensaio via WhatsApp"}
           </a>
         </div>
       </div>
