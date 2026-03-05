@@ -36,7 +36,9 @@ export function middleware(request: NextRequest) {
     .split(",")
     .map((d) => d.trim().toLowerCase())
     .filter(Boolean);
-  const isPlatformDomain = platformDomains.some((d) => requestHost === d);
+  const isVercelDeployment = requestHost.endsWith(".vercel.app");
+  const isPlatformDomain =
+    platformDomains.some((d) => requestHost === d) || isVercelDeployment;
   const hasExplicitTenantParam = slugParam && slugParam !== "" && slugParam !== "clear";
   const hasTenantCookie = slugFromCookie && slugFromCookie !== "";
   const showPlatform =
