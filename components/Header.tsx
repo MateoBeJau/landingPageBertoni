@@ -5,12 +5,11 @@ import { Menu, X, Camera } from "lucide-react";
 import { useTenant } from "@/components/TenantProvider";
 
 const navLinks = [
-  { label: "Início", href: "#inicio" },
-  { label: "Fotografia Única", href: "#foto-unica" },
-  { label: "Séries", href: "#series" },
-  { label: "Ensaios", href: "#ensaios" },
-  { label: "Sobre", href: "#sobre" },
-  { label: "Contato", href: "#contato" },
+  { label: "Início", hash: "#inicio" },
+  { label: "Fotografia Única", hash: "#foto-unica" },
+  { label: "Séries", hash: "#series" },
+  { label: "Sobre", hash: "#sobre" },
+  { label: "Contato", hash: "#contato" },
 ];
 
 const WHATSAPP_MESSAGE =
@@ -21,6 +20,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
+  const basePath = tenant.basePath || "";
+  const homeHref = basePath || "/";
   const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <a
-            href="#inicio"
+            href={`${homeHref}#inicio`}
             className="flex items-center gap-2 group"
             onClick={handleNavClick}
           >
@@ -65,8 +66,8 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <a
-                key={link.href}
-                href={link.href}
+                key={link.hash}
+                href={`${homeHref}${link.hash}`}
                 className="text-stone-300 hover:text-white text-sm font-sans font-medium tracking-wide transition-colors duration-200 relative group"
               >
                 {link.label}
@@ -107,8 +108,8 @@ export default function Header() {
         <div className="bg-stone-950/98 backdrop-blur-md border-t border-stone-800 px-4 py-4 flex flex-col gap-1">
           {navLinks.map((link) => (
             <a
-              key={link.href}
-              href={link.href}
+              key={link.hash}
+              href={`${homeHref}${link.hash}`}
               onClick={handleNavClick}
               className="text-stone-300 hover:text-white hover:bg-white/5 text-sm font-sans font-medium tracking-wide py-3 px-3 rounded-sm transition-colors duration-200"
             >

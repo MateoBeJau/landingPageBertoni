@@ -11,7 +11,6 @@ import {
   FileText,
   Image,
   Layers,
-  BookOpen,
   LogOut,
   Menu,
   X,
@@ -26,7 +25,6 @@ const navItems = [
   { href: "/panel/conteudo", label: "Conteúdo", icon: FileText },
   { href: "/panel/fotos", label: "Fotos", icon: Image },
   { href: "/panel/series", label: "Séries", icon: Layers },
-  { href: "/panel/ensaios", label: "Ensaios", icon: BookOpen },
   { href: "/panel/senha", label: "Alterar Senha", icon: Key },
 ];
 

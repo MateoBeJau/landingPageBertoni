@@ -3,7 +3,7 @@ import { put } from "@vercel/blob";
 import { getAdminSession } from "@/lib/auth";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-const MAX_SIZE_MB = 10;
+const MAX_SIZE_MB = 3; // Límite para ahorrar almacenamiento y bandwidth
 
 export async function POST(req: NextRequest) {
   const session = await getAdminSession();

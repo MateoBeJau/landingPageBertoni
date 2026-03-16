@@ -33,7 +33,7 @@ export default function HeroSection() {
         <div className="max-w-3xl">
           {/* Badge */}
           <div
-            className="inline-flex items-center gap-2 text-white text-xs font-sans uppercase tracking-[0.2em] px-4 py-1.5 rounded-sm mb-6 md:mb-8"
+            className="flex items-center justify-center gap-2 text-white text-xs font-sans uppercase tracking-[0.2em] px-4 py-1.5 rounded-sm mb-6 md:mb-8 mx-auto w-fit"
             style={{ backgroundColor: `${tenant.colorPrimary}E6` }}
           >
             <span className="w-1.5 h-1.5 bg-white rounded-full" />
@@ -72,12 +72,20 @@ export default function HeroSection() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-stone-400">
+      <a
+        href="#foto-unica"
+        onClick={(e) => {
+          e.preventDefault();
+          document.getElementById("foto-unica")?.scrollIntoView({ behavior: "smooth" });
+        }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 text-stone-400 hover:text-white transition-colors cursor-pointer"
+        aria-label={tenant.heroScrollLabel || "Rolar para ver o portfólio"}
+      >
         <span className="font-sans text-xs uppercase tracking-[0.2em]">
           {tenant.heroScrollLabel || "Rolar"}
         </span>
         <ChevronDown size={18} className="animate-bounce" />
-      </div>
+      </a>
     </section>
   );
 }

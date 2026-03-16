@@ -4,7 +4,6 @@ import { usePanelContext } from "./layout";
 import {
   Image,
   Layers,
-  BookOpen,
   ExternalLink,
   Camera,
   TrendingUp,
@@ -82,17 +81,6 @@ export default function PanelDashboard() {
             <div className="flex items-center gap-2 text-stone-500">
               <Layers className="h-4 w-4" />
               <span className="text-sm font-medium">Séries</span>
-            </div>
-            <p className="mt-2 text-2xl font-bold text-stone-900">—</p>
-          </Link>
-
-          <Link
-            href="/panel/ensaios"
-            className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div className="flex items-center gap-2 text-stone-500">
-              <BookOpen className="h-4 w-4" />
-              <span className="text-sm font-medium">Ensaios</span>
             </div>
             <p className="mt-2 text-2xl font-bold text-stone-900">—</p>
           </Link>

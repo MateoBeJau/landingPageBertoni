@@ -5,15 +5,15 @@ import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
 
 const navLinks = [
-  { label: "Início", href: "#inicio" },
-  { label: "Fotografia Única", href: "#foto-unica" },
-  { label: "Séries", href: "#series" },
-  { label: "Ensaios", href: "#ensaios" },
-  { label: "Sobre", href: "#sobre" },
+  { label: "Início", hash: "#inicio" },
+  { label: "Fotografia Única", hash: "#foto-unica" },
+  { label: "Séries", hash: "#series" },
+  { label: "Sobre", hash: "#sobre" },
 ];
 
 export default function Footer() {
   const tenant = useTenant();
+  const homeHref = tenant.basePath || "/";
   const year = new Date().getFullYear();
   const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
@@ -71,9 +71,9 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2.5">
               {navLinks.map((link) => (
-                <li key={link.href}>
+                <li key={link.hash}>
                   <a
-                    href={link.href}
+                    href={`${homeHref}${link.hash}`}
                     className="font-sans text-stone-400 hover:text-white text-sm transition-colors duration-200"
                   >
                     {link.label}
