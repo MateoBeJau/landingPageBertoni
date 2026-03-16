@@ -78,30 +78,30 @@ export default function IndividualGallery() {
           ))}
         </div>
 
-        {/* Photo Grid - masonry con proporción natural */}
+        {/* Photo Grid - cuadradas uniformes */}
         <motion.div
           key={activeCategory}
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-60px" }}
-          className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
         >
           {filtered.map((photo) => (
             <Link
               key={photo.id}
               href={`${basePath}/foto/${photo.slug}`}
-              className="break-inside-avoid block mb-3 sm:mb-4"
+              className="block aspect-square"
             >
               <motion.div
                 variants={itemVariants}
-                className="gallery-item group relative overflow-hidden rounded-sm bg-stone-100 cursor-pointer"
+                className="gallery-item group relative overflow-hidden rounded-sm bg-stone-100 cursor-pointer h-full w-full"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
                   alt={photo.title}
-                  className="block w-full h-auto transition-transform duration-500 group-hover:scale-105"
+                  className="block w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                   onContextMenu={(e) => e.preventDefault()}
                 />
                 {/* Hover overlay */}

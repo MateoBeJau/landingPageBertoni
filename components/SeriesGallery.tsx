@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -36,6 +37,38 @@ function SeriesModal({
   const slides = displayPhotos
     .filter((p) => p.imageSrc || p.imageThumb)
     .map((p, i) => ({ src: p.imageSrc || p.imageThumb, alt: p.title || `Photo ${i + 1}` }));
+
+  // Resolve detail URL: gallery photo slug, or null for serie-only (we use serie route)
+  const getGallerySlug = (photo: (typeof displayPhotos)[number]) => {
+    if ("slug" in photo && photo.slug) return photo.slug;
+    const byUrl = tenant.photos.find(
+      (p) =>
+        p.imageSrc === photo.imageSrc ||
+        p.imageSrc === photo.imageThumb ||
+        p.imageThumb === photo.imageSrc ||
+        p.imageThumb === photo.imageThumb
+    );
+    if (byUrl) return byUrl.slug;
+    const byTitleLocation = tenant.photos.find((p) => {
+      if (p.title.trim().toLowerCase() !== photo.title.trim().toLowerCase()) return false;
+      const pLoc = p.location?.trim().toLowerCase() || "";
+      const sLoc = photo.location?.trim().toLowerCase() || "";
+      return !pLoc || !sLoc || pLoc === sLoc;
+    });
+    return byTitleLocation?.slug ?? null;
+  };
+
+  // Every photo goes to detail: gallery page or serie photo page (never lightbox on click)
+  const getDetailHref = (photo: (typeof displayPhotos)[number]) => {
+    const gallerySlug = getGallerySlug(photo);
+    const basePath = tenant.basePath || "";
+    if (gallerySlug) return `${basePath}/foto/${gallerySlug}`;
+    // Serie-only photo: use serie detail route
+    if (photo.id && photo.id !== "cover") {
+      return `${basePath}/serie/${serie.slug}/foto/${photo.id}`;
+    }
+    return null; // synthetic cover fallback
+  };
 
   // Lock body scroll while modal is open
   useEffect(() => {
@@ -95,37 +128,57 @@ function SeriesModal({
 
             {/* Photos Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mb-8">
-              {displayPhotos.map((photo, index) => (
-                <div
-                  key={photo.id || `photo-${index}`}
-                  onClick={() => setLightboxIndex(index)}
-                  className="gallery-item group relative overflow-hidden rounded-sm bg-stone-800 cursor-pointer"
-                  style={{ aspectRatio: "4/3" }}
-                >
-                  <Image
-                    src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
-                    alt={photo.title}
-                    fill
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    onContextMenu={(e) => e.preventDefault()}
-                    unoptimized={(photo.imageThumb || photo.imageSrc || "").includes("blob.vercel-storage.com")}
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                    <p className="font-serif text-white text-sm font-medium">
-                      {photo.title}
-                    </p>
-                    <p className="font-sans text-stone-300 text-xs flex items-center gap-1 mt-0.5">
-                      <MapPin size={10} />
-                      {photo.location}
-                    </p>
+              {displayPhotos.map((photo, index) => {
+                const href = getDetailHref(photo);
+                const cellClass = "gallery-item group relative overflow-hidden rounded-sm bg-stone-800 cursor-pointer";
+                const cellStyle = { aspectRatio: "4/3" as const };
+                const content = (
+                  <>
+                    <Image
+                      src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
+                      alt={photo.title}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      onContextMenu={(e) => e.preventDefault()}
+                      unoptimized={(photo.imageThumb || photo.imageSrc || "").includes("blob.vercel-storage.com")}
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                      <p className="font-serif text-white text-sm font-medium">
+                        {photo.title}
+                      </p>
+                      <p className="font-sans text-stone-300 text-xs flex items-center gap-1 mt-0.5">
+                        <MapPin size={10} />
+                        {photo.location}
+                      </p>
+                    </div>
+                    <div className="absolute top-2 left-2 bg-black/60 text-stone-300 text-xs font-sans px-1.5 py-0.5 rounded-sm">
+                      {index + 1}/{displayPhotos.length}
+                    </div>
+                  </>
+                );
+
+                return href ? (
+                  <Link
+                    key={photo.id || `photo-${index}`}
+                    href={href}
+                    className={`relative block ${cellClass}`}
+                    style={cellStyle}
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <div
+                    key={photo.id || `photo-${index}`}
+                    onClick={() => setLightboxIndex(index)}
+                    className={`relative ${cellClass}`}
+                    style={cellStyle}
+                  >
+                    {content}
                   </div>
-                  <div className="absolute top-2 left-2 bg-black/60 text-stone-300 text-xs font-sans px-1.5 py-0.5 rounded-sm">
-                    {index + 1}/{displayPhotos.length}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Buy CTA */}

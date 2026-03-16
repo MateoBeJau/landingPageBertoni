@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import StatsStrip from "@/components/StatsStrip";
 import IndividualGallery from "@/components/IndividualGallery";
 import SeriesGallery from "@/components/SeriesGallery";
 import ContactBanner from "@/components/ContactBanner";
@@ -14,7 +13,6 @@ export default function TenantHome() {
       <Header />
       <main>
         <HeroSection />
-        <StatsStrip />
         <IndividualGallery />
         <SeriesGallery />
         <ContactBanner />

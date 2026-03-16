@@ -25,7 +25,10 @@ export async function getTenantByDomain(
         where: { active: true },
         orderBy: { order: "asc" },
         include: {
-          photos: { orderBy: { order: "asc" } },
+          photos: {
+            orderBy: { order: "asc" },
+            include: { photo: true },
+          },
         },
       },
       ensaios: {
@@ -54,7 +57,10 @@ export async function getTenantBySlug(
         where: { active: true },
         orderBy: { order: "asc" },
         include: {
-          photos: { orderBy: { order: "asc" } },
+          photos: {
+            orderBy: { order: "asc" },
+            include: { photo: true },
+          },
         },
       },
       ensaios: {
@@ -136,6 +142,7 @@ function mapTenantToConfig(tenant: {
       imageSrc: string;
       imageThumb: string;
       order: number;
+      photo?: { slug: string } | null;
     }>;
   }>;
   ensaios: Array<{
@@ -248,6 +255,7 @@ function mapTenantToConfig(tenant: {
         imageSrc: sp.imageSrc,
         imageThumb: sp.imageThumb,
         order: sp.order,
+        slug: sp.photo?.slug ?? null,
       })),
     })),
     ensaios: tenant.ensaios.map((e) => ({

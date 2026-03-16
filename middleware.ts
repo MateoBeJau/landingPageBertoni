@@ -52,7 +52,7 @@ export function middleware(request: NextRequest) {
 
   const pathSegments = url.pathname.split("/").filter(Boolean);
   const firstSegment = pathSegments[0];
-  if (firstSegment && firstSegment !== "foto") {
+  if (firstSegment && firstSegment !== "foto" && firstSegment !== "serie") {
     response.headers.set("x-tenant-slug", firstSegment);
   }
 

@@ -22,6 +22,8 @@ export interface TenantSeriesPhoto {
   imageSrc: string;
   imageThumb: string;
   order: number;
+  /** Slug from linked Photo, when series photo is linked to individual gallery */
+  slug?: string | null;
 }
 
 export interface TenantSeries {
