@@ -2439,7 +2439,7 @@ export default function TenantEditorPage({
                 )}
               </div>
               <div>
-                <label className="mb-2 block text-sm font-medium text-stone-700">Fotos da série (até 3)</label>
+                <label className="mb-2 block text-sm font-medium text-stone-700">Fotos da série (até 6)</label>
                 {seriesPhotos.map((photo, idx) => (
                   <div key={idx} className="mb-4 rounded-lg border border-stone-200 bg-stone-50 p-4">
                     <div className="mb-2 flex items-center justify-between">
@@ -2482,7 +2482,7 @@ export default function TenantEditorPage({
                     {photo.imageSrc && <div className="mt-2 h-16 w-16 overflow-hidden rounded border border-stone-200"><img src={photo.imageSrc} alt="" className="h-full w-full object-cover" /></div>}
                   </div>
                 ))}
-                {seriesPhotos.length < 3 && (
+                {seriesPhotos.length < 6 && (
                   <button type="button" onClick={() => setSeriesPhotos([...seriesPhotos, { title: "", location: "", year: new Date().getFullYear(), imageSrc: "", imageThumb: "", category: "", price: "", format: "", printType: "" }])} className="flex items-center gap-1.5 rounded-lg border border-dashed border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50">
                     <Plus className="w-4 h-4" />
                     Adicionar foto
