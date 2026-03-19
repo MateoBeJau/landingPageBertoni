@@ -18,7 +18,12 @@ export async function GET(
       photos: { orderBy: { order: "asc" } },
       series: {
         orderBy: { order: "asc" },
-        include: { photos: { orderBy: { order: "asc" } } },
+        include: {
+          photos: {
+            orderBy: { order: "asc" },
+            include: { photo: true },
+          },
+        },
       },
       ensaios: { orderBy: { order: "asc" } },
       users: {

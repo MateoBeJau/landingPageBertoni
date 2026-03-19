@@ -862,14 +862,14 @@ export default function TenantEditorPage({
     .filter((c): c is string => !!c?.trim());
   const categoriesList = [...new Set([...categoriesFromTenant, ...categoriesFromPhotos])].sort();
 
-  type SeriesItem = { id: string; title: string; slug: string; subtitle: string; description: string; cover: string; order: number; active: boolean; photos?: Array<{ title: string; location: string; year: number; imageSrc: string; imageThumb: string; order: number }> };
+  type SeriesItem = { id: string; title: string; slug: string; subtitle: string; description: string; cover: string; order: number; active: boolean; photos?: Array<{ title: string; location: string; year: number; imageSrc: string; imageThumb: string; order: number; photo?: { category: string | null; price: string | null; format: string | null; printType: string | null } }> };
   type EnsaioItem = { id: string; title: string; slug: string; subtitle: string; description: string; cover: string; priceInfo: string; order: number; active: boolean };
   const [seriesList, setSeriesList] = useState<SeriesItem[]>([]);
   const [ensaiosList, setEnsaiosList] = useState<EnsaioItem[]>([]);
   const [showSeriesForm, setShowSeriesForm] = useState(false);
   const [editingSeriesId, setEditingSeriesId] = useState<string | null>(null);
   const [seriesForm, setSeriesForm] = useState({ title: "", slug: "", subtitle: "", description: "", cover: "", order: 0, active: true });
-  const [seriesPhotos, setSeriesPhotos] = useState<Array<{ title: string; location: string; year: number; imageSrc: string; imageThumb: string }>>([]);
+  const [seriesPhotos, setSeriesPhotos] = useState<Array<{ title: string; location: string; year: number; imageSrc: string; imageThumb: string; category: string; price: string; format: string; printType: string }>>([]);
   const [showEnsaioForm, setShowEnsaioForm] = useState(false);
   const [editingEnsaioId, setEditingEnsaioId] = useState<string | null>(null);
   const [ensaioForm, setEnsaioForm] = useState({ title: "", slug: "", subtitle: "", description: "", cover: "", priceInfo: "Sob consulta", order: 0, active: true });
@@ -897,7 +897,7 @@ export default function TenantEditorPage({
   function openEditSeries(s: SeriesItem) {
     setEditingSeriesId(s.id);
     setSeriesForm({ title: s.title, slug: s.slug, subtitle: s.subtitle, description: s.description, cover: s.cover, order: s.order, active: s.active });
-    setSeriesPhotos((s.photos ?? []).map((p) => ({ title: p.title, location: p.location, year: p.year, imageSrc: p.imageSrc, imageThumb: p.imageThumb })));
+    setSeriesPhotos((s.photos ?? []).map((p) => ({ title: p.title, location: p.location, year: p.year, imageSrc: p.imageSrc, imageThumb: p.imageThumb, category: p.photo?.category ?? "", price: p.photo?.price ?? "", format: p.photo?.format ?? "", printType: p.photo?.printType ?? "" })));
     setShowSeriesForm(true);
   }
   function closeSeriesPanel() {
@@ -907,7 +907,7 @@ export default function TenantEditorPage({
   }
   async function handleCreateSeries() {
     if (!seriesForm.title || !seriesForm.slug) { showToast("error", "Preencha título e slug"); return; }
-    const photos = seriesPhotos.filter((p) => p.imageSrc || p.imageThumb).map((p) => ({ title: p.title || "Foto", location: p.location || "", year: p.year || new Date().getFullYear(), imageSrc: p.imageSrc || p.imageThumb, imageThumb: p.imageThumb || p.imageSrc }));
+    const photos = seriesPhotos.filter((p) => p.imageSrc || p.imageThumb).map((p) => ({ title: p.title || "Foto", location: p.location || "", year: p.year || new Date().getFullYear(), imageSrc: p.imageSrc || p.imageThumb, imageThumb: p.imageThumb || p.imageSrc, category: p.category || undefined, price: p.price || undefined, format: p.format || undefined, printType: p.printType || undefined }));
     try {
       const res = await fetch("/api/admin/series", {
         method: "POST",
@@ -923,7 +923,7 @@ export default function TenantEditorPage({
   }
   async function handleUpdateSeries() {
     if (!editingSeriesId) return;
-    const photos = seriesPhotos.filter((p) => p.imageSrc || p.imageThumb).map((p) => ({ title: p.title || "Foto", location: p.location || "", year: p.year || new Date().getFullYear(), imageSrc: p.imageSrc || p.imageThumb, imageThumb: p.imageThumb || p.imageSrc }));
+    const photos = seriesPhotos.filter((p) => p.imageSrc || p.imageThumb).map((p) => ({ title: p.title || "Foto", location: p.location || "", year: p.year || new Date().getFullYear(), imageSrc: p.imageSrc || p.imageThumb, imageThumb: p.imageThumb || p.imageSrc, category: p.category || undefined, price: p.price || undefined, format: p.format || undefined, printType: p.printType || undefined }));
     try {
       const res = await fetch(`/api/admin/series/${editingSeriesId}`, {
         method: "PUT",
@@ -2452,6 +2452,18 @@ export default function TenantEditorPage({
                       <input value={photo.title} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, title: e.target.value } : p))} className={inputClass} placeholder="Título" />
                       <input value={photo.location} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, location: e.target.value } : p))} className={inputClass} placeholder="Local" />
                       <input type="number" value={photo.year || ""} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, year: parseInt(e.target.value) || new Date().getFullYear() } : p))} className={inputClass} placeholder="Ano" />
+                      <div>
+                        <label className="block text-[10px] font-medium text-stone-500 mb-0.5">Categoria</label>
+                        <select value={photo.category || ""} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, category: e.target.value } : p))} className={inputClass}>
+                          <option value="">—</option>
+                          {categoriesList.map((c) => (
+                            <option key={c} value={c}>{c}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <input value={photo.price || ""} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, price: e.target.value } : p))} className={inputClass} placeholder="Preço (ex: R$ 150)" />
+                      <input value={photo.format || ""} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, format: e.target.value } : p))} className={inputClass} placeholder="Formato (ex: 30x40 cm)" />
+                      <input value={photo.printType || ""} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, printType: e.target.value } : p))} className={inputClass} placeholder="Tipo de impressão" />
                     </div>
                     <div className="flex gap-2">
                       <input value={photo.imageSrc} onChange={(e) => setSeriesPhotos(seriesPhotos.map((p, i) => i === idx ? { ...p, imageSrc: e.target.value, imageThumb: e.target.value } : p))} className={inputClass} placeholder="URL da imagem" />
@@ -2471,7 +2483,7 @@ export default function TenantEditorPage({
                   </div>
                 ))}
                 {seriesPhotos.length < 3 && (
-                  <button type="button" onClick={() => setSeriesPhotos([...seriesPhotos, { title: "", location: "", year: new Date().getFullYear(), imageSrc: "", imageThumb: "" }])} className="flex items-center gap-1.5 rounded-lg border border-dashed border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50">
+                  <button type="button" onClick={() => setSeriesPhotos([...seriesPhotos, { title: "", location: "", year: new Date().getFullYear(), imageSrc: "", imageThumb: "", category: "", price: "", format: "", printType: "" }])} className="flex items-center gap-1.5 rounded-lg border border-dashed border-stone-300 px-4 py-2 text-sm text-stone-600 hover:bg-stone-50">
                     <Plus className="w-4 h-4" />
                     Adicionar foto
                   </button>
