@@ -3,13 +3,15 @@
 import { Shield } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export default function ContactBanner() {
   const tenant = useTenant();
 
-  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
+  const whatsappLink = buildWhatsAppUrl(
+    tenant.whatsappNumber,
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
-  )}`;
+  );
 
   return (
     <section

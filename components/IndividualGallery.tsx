@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, Variants } from "framer-motion";
 import { MapPin } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -19,12 +21,20 @@ const itemVariants: Variants = {
 
 export default function IndividualGallery() {
   const tenant = useTenant();
+  const searchParams = useSearchParams();
   const basePath = tenant.basePath || "";
   const categoryList = (tenant.categories.length > 0 ? tenant.categories : [])
     .filter((c) => c !== "Todas");
   const categories = [...categoryList, "Todas"];
   const defaultCategory = categoryList.length > 0 ? categoryList[0] : "Todas";
   const [activeCategory, setActiveCategory] = useState(defaultCategory);
+
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    if (cat && (categories.includes(cat) || cat === "Todas")) {
+      setActiveCategory(cat);
+    }
+  }, [searchParams]);
 
   const filtered =
     activeCategory === "Todas"
@@ -33,7 +43,7 @@ export default function IndividualGallery() {
 
   const whatsappGenericMessage =
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.";
-  const whatsappGenericHref = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(whatsappGenericMessage)}`;
+  const whatsappGenericHref = buildWhatsAppUrl(tenant.whatsappNumber, whatsappGenericMessage);
 
   return (
     <section id="foto-unica" className="py-20 md:py-28 bg-white">
@@ -90,7 +100,7 @@ export default function IndividualGallery() {
           {filtered.map((photo) => (
             <Link
               key={photo.id}
-              href={`${basePath}/foto/${photo.slug}`}
+              href={`${basePath}/foto/${photo.slug}${activeCategory !== "Todas" ? `?category=${encodeURIComponent(activeCategory)}` : ""}`}
               className="block aspect-square"
             >
               <motion.div

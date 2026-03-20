@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Camera } from "lucide-react";
 import { useTenant } from "@/components/TenantProvider";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const navLinks = [
   { label: "Início", hash: "#inicio" },
@@ -22,7 +23,7 @@ export default function Header() {
 
   const basePath = tenant.basePath || "";
   const homeHref = basePath || "/";
-  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`;
+  const whatsappLink = buildWhatsAppUrl(tenant.whatsappNumber, WHATSAPP_MESSAGE);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);

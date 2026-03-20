@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Camera, Award, MapPin } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const defaultHighlights = [
   { icon: Camera, label: "15+ anos de experiência", desc: "Fotografando o Sul e o Brasil" },
@@ -16,9 +17,10 @@ export default function AboutSection() {
   const highlights = (tenant.aboutHighlights && tenant.aboutHighlights.length >= 3)
     ? defaultHighlights.map((d, i) => ({ ...d, label: tenant.aboutHighlights![i].label, desc: tenant.aboutHighlights![i].desc }))
     : defaultHighlights;
-  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
+  const whatsappLink = buildWhatsAppUrl(
+    tenant.whatsappNumber,
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
-  )}`;
+  );
 
   return (
     <section id="sobre" className="py-20 md:py-28 bg-stone-950">

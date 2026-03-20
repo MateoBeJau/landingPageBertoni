@@ -11,11 +11,13 @@ import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
 import type { TenantSeries, TenantConfig } from "@/lib/types";
 
+import { buildWhatsAppUrl as buildWspUrl } from "@/lib/whatsapp";
+
 function buildWhatsAppUrl(whatsappNumber: string, context?: string): string {
   const message = context
     ? `Olá, tenho interesse na foto "${context}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`
     : `Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.`;
-  return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+  return buildWspUrl(whatsappNumber, message);
 }
 
 function SeriesModal({

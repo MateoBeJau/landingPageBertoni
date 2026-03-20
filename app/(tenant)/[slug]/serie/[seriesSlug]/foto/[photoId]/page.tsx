@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProtectedImage from "@/components/ProtectedImage";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export default async function SeriePhotoPageByPath({
   params,
@@ -28,10 +29,8 @@ export default async function SeriePhotoPageByPath({
   );
   if (!photo) notFound();
 
-  const whatsappMsg = encodeURIComponent(
-    `Olá, tenho interesse na foto "${photo.title}" (série ${serie.title}). Poderia me passar mais informações sobre valores e formatos disponíveis?`
-  );
-  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${whatsappMsg}`;
+  const whatsappMsg = `Olá, tenho interesse na foto "${photo.title}" (série ${serie.title}). Poderia me passar mais informações sobre valores e formatos disponíveis?`;
+  const whatsappLink = buildWhatsAppUrl(tenant.whatsappNumber, whatsappMsg);
 
   // When slug is "serie", path was /serie/... (custom domain) — basePath is empty
   const basePath = slug === "serie" ? "" : `/${slug}`;
@@ -136,6 +135,17 @@ export default async function SeriePhotoPageByPath({
               </div>
             </div>
           </div>
+
+          <Link
+            href={`${basePath}#series`}
+            className="mt-12 inline-flex items-center gap-2 text-stone-500 hover:text-stone-900 font-sans text-sm transition-colors duration-200 group"
+          >
+            <ArrowLeft
+              size={16}
+              className="transition-transform group-hover:-translate-x-1"
+            />
+            Voltar para série
+          </Link>
         </div>
       </main>
       <Footer />

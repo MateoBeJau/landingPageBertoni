@@ -5,10 +5,7 @@ import { motion, Variants } from "framer-motion";
 import { ChevronRight, BookOpen } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
-
-function buildWhatsAppUrl(number: string, message: string): string {
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
-}
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 24 },

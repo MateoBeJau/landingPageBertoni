@@ -3,6 +3,7 @@
 import { Camera, Instagram, Facebook, Mail } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const navLinks = [
   { label: "Início", hash: "#inicio" },
@@ -15,9 +16,10 @@ export default function Footer() {
   const tenant = useTenant();
   const homeHref = tenant.basePath || "/";
   const year = new Date().getFullYear();
-  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${encodeURIComponent(
+  const whatsappLink = buildWhatsAppUrl(
+    tenant.whatsappNumber,
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
-  )}`;
+  );
 
   const socialLinks = [
     ...(tenant.instagramUrl ? [{ icon: Instagram, label: "Instagram", href: tenant.instagramUrl }] : []),

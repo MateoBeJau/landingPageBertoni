@@ -8,13 +8,17 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProtectedImage from "@/components/ProtectedImage";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
+import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export default async function PhotoPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ category?: string }>;
 }) {
   const { slug } = await params;
+  const { category } = await searchParams;
   const headersList = await headers();
   const tenant = await getTenantFromHeaders(headersList);
 
@@ -23,10 +27,12 @@ export default async function PhotoPage({
   const photo = tenant.photos.find((p) => p.slug === slug);
   if (!photo) notFound();
 
-  const whatsappMsg = encodeURIComponent(
-    `Olá, tenho interesse na foto "${photo.title}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`
-  );
-  const whatsappLink = `https://wa.me/${tenant.whatsappNumber}?text=${whatsappMsg}`;
+  const whatsappMsg = `Olá, tenho interesse na foto "${photo.title}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`;
+  const whatsappLink = buildWhatsAppUrl(tenant.whatsappNumber, whatsappMsg);
+
+  const backHref = category
+    ? `/?category=${encodeURIComponent(category)}#foto-unica`
+    : "/#foto-unica";
 
   return (
     <TenantProvider tenant={tenant}>
@@ -34,7 +40,7 @@ export default async function PhotoPage({
       <main className="min-h-screen bg-stone-50 pt-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link
-            href="/#foto-unica"
+            href={backHref}
             className="inline-flex items-center gap-2 text-stone-500 hover:text-stone-900 font-sans text-sm transition-colors duration-200 group"
           >
             <ArrowLeft
@@ -75,12 +81,16 @@ export default async function PhotoPage({
               </div>
 
               {photo.description && (
-                <p
-                  className="font-sans text-stone-600 text-base leading-relaxed border-l-2 pl-4"
+                <div
+                  className="font-sans text-stone-600 text-base leading-relaxed border-l-2 pl-4 space-y-4"
                   style={{ borderColor: tenant.colorPrimary }}
                 >
-                  {photo.description}
-                </p>
+                  {photo.description.split(/\n\n+/).map((paragraph, i) => (
+                    <p key={i} className="whitespace-pre-line">
+                      {paragraph.trim()}
+                    </p>
+                  ))}
+                </div>
               )}
 
               <div className="bg-stone-100 rounded-sm p-4 border border-stone-200">
@@ -178,6 +188,17 @@ export default async function PhotoPage({
               </div>
             </div>
           </div>
+
+          <Link
+            href={backHref}
+            className="mt-12 inline-flex items-center gap-2 text-stone-500 hover:text-stone-900 font-sans text-sm transition-colors duration-200 group"
+          >
+            <ArrowLeft
+              size={16}
+              className="transition-transform group-hover:-translate-x-1"
+            />
+            Voltar para galeria
+          </Link>
         </div>
       </main>
       <Footer />
