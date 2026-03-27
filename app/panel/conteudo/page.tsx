@@ -226,13 +226,16 @@ export default function PanelConteudoPage() {
               />
             </FieldRow>
             <FieldRow label="Subtítulo">
-              <input
-                type="text"
+              <p className="mb-2 text-xs text-stone-500">
+                Uma linha em branco entre blocos vira um parágrafo novo na landing.
+              </p>
+              <textarea
+                rows={6}
                 value={form.heroSubtitle}
                 onChange={(e) =>
                   setForm({ ...form, heroSubtitle: e.target.value })
                 }
-                className={inputClass}
+                className={`${inputClass} resize-y min-h-[120px]`}
               />
             </FieldRow>
             <FieldRow label="Badge">

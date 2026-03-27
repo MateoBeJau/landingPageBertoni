@@ -47,9 +47,17 @@ export default function HeroSection() {
           </h1>
 
           {/* Subtext */}
-          <p className="font-sans text-stone-300 text-base sm:text-lg md:text-xl leading-relaxed mb-8 md:mb-10 max-w-2xl mx-auto">
-            {tenant.heroSubtitle}
-          </p>
+          <div className="font-sans text-stone-300 text-base sm:text-lg md:text-xl leading-relaxed mb-8 md:mb-10 max-w-2xl mx-auto space-y-4">
+            {tenant.heroSubtitle
+              .split(/\n\n+/)
+              .map((p) => p.trim())
+              .filter(Boolean)
+              .map((paragraph, i) => (
+                <p key={i} className="whitespace-pre-line">
+                  {paragraph}
+                </p>
+              ))}
+          </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
