@@ -5,10 +5,13 @@ import { Menu, X, Camera } from "lucide-react";
 import { useTenant } from "@/components/TenantProvider";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
-const navLinks = [
+const navLinksBeforeInstagram = [
   { label: "Início", hash: "#inicio" },
   { label: "Fotografia Única", hash: "#foto-unica" },
   { label: "Séries", hash: "#series" },
+];
+
+const navLinksAfterInstagram = [
   { label: "Sobre", hash: "#sobre" },
   { label: "Contato", hash: "#contato" },
 ];
@@ -65,7 +68,34 @@ export default function Header() {
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
+            {navLinksBeforeInstagram.map((link) => (
+              <a
+                key={link.hash}
+                href={`${homeHref}${link.hash}`}
+                className="text-stone-300 hover:text-white text-sm font-sans font-medium tracking-wide transition-colors duration-200 relative group"
+              >
+                {link.label}
+                <span
+                  className="absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: tenant.colorPrimary }}
+                />
+              </a>
+            ))}
+            {tenant.instagramUrl && (
+              <a
+                href={tenant.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-stone-300 hover:text-white text-sm font-sans font-medium tracking-wide transition-colors duration-200 relative group"
+              >
+                Instagram
+                <span
+                  className="absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"
+                  style={{ backgroundColor: tenant.colorPrimary }}
+                />
+              </a>
+            )}
+            {navLinksAfterInstagram.map((link) => (
               <a
                 key={link.hash}
                 href={`${homeHref}${link.hash}`}
@@ -107,7 +137,28 @@ export default function Header() {
         }`}
       >
         <div className="bg-stone-950/98 backdrop-blur-md border-t border-stone-800 px-4 py-4 flex flex-col gap-1">
-          {navLinks.map((link) => (
+          {navLinksBeforeInstagram.map((link) => (
+            <a
+              key={link.hash}
+              href={`${homeHref}${link.hash}`}
+              onClick={handleNavClick}
+              className="text-stone-300 hover:text-white hover:bg-white/5 text-sm font-sans font-medium tracking-wide py-3 px-3 rounded-sm transition-colors duration-200"
+            >
+              {link.label}
+            </a>
+          ))}
+          {tenant.instagramUrl && (
+            <a
+              href={tenant.instagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={handleNavClick}
+              className="text-stone-300 hover:text-white hover:bg-white/5 text-sm font-sans font-medium tracking-wide py-3 px-3 rounded-sm transition-colors duration-200"
+            >
+              Instagram
+            </a>
+          )}
+          {navLinksAfterInstagram.map((link) => (
             <a
               key={link.hash}
               href={`${homeHref}${link.hash}`}
