@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { motion, Variants } from "framer-motion";
-import { MapPin } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
+import type { TenantPhoto } from "@/lib/types";
 
 const containerVariants: Variants = {
   hidden: {},
@@ -19,36 +20,106 @@ const itemVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
+const MAX_CATEGORY_CARDS = 8;
+
+function photosForCategory(
+  photos: TenantPhoto[],
+  category: string
+): TenantPhoto[] {
+  return photos
+    .filter((p) => p.category === category)
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+}
+
 export default function IndividualGallery() {
   const tenant = useTenant();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const basePath = tenant.basePath || "";
-  const categoryList = (tenant.categories.length > 0 ? tenant.categories : [])
-    .filter((c) => c !== "Todas");
-  const categories = [...categoryList, "Todas"];
-  const defaultCategory = categoryList.length > 0 ? categoryList[0] : "Todas";
-  const [activeCategory, setActiveCategory] = useState(defaultCategory);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const categoriesWithPhotos = useMemo(
+    () =>
+      tenant.categories
+        .filter((c) => c !== "Todas")
+        .filter((c) => tenant.photos.some((p) => p.category === c)),
+    [tenant.categories, tenant.photos]
+  );
+
+  const displayedCategories = useMemo(
+    () => categoriesWithPhotos.slice(0, MAX_CATEGORY_CARDS),
+    [categoriesWithPhotos]
+  );
+
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    null
+  );
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
   useEffect(() => {
     const cat = searchParams.get("category");
-    if (cat && (categories.includes(cat) || cat === "Todas")) {
-      setActiveCategory(cat);
+    if (cat && categoriesWithPhotos.includes(cat)) {
+      setSelectedCategory(cat);
+    } else if (!cat || !categoriesWithPhotos.includes(cat)) {
+      setSelectedCategory(null);
     }
-  }, [searchParams]);
+  }, [searchParams, categoriesWithPhotos]);
 
-  const filtered =
-    activeCategory === "Todas"
-      ? tenant.photos
-      : tenant.photos.filter((p) => p.category === activeCategory);
+  const selectCategory = useCallback(
+    (cat: string) => {
+      setSelectedCategory(cat);
+      router.replace(
+        `${pathname}?category=${encodeURIComponent(cat)}#foto-unica`,
+        { scroll: false }
+      );
+    },
+    [router, pathname]
+  );
+
+  const clearCategory = useCallback(() => {
+    setSelectedCategory(null);
+    router.replace(`${pathname}#foto-unica`, { scroll: false });
+  }, [router, pathname]);
+
+  const carouselPhotos = selectedCategory
+    ? photosForCategory(tenant.photos, selectedCategory)
+    : [];
+
+  useEffect(() => {
+    setCarouselIndex(0);
+    if (carouselRef.current && carouselPhotos.length > 0) {
+      carouselRef.current.scrollTo({ left: 0, behavior: "auto" });
+    }
+  }, [selectedCategory, carouselPhotos.length]);
+
+  const goCarousel = (dir: -1 | 1) => {
+    const n = carouselPhotos.length;
+    if (n === 0) return;
+    setCarouselIndex((i) => {
+      const next = (i + dir + n) % n;
+      requestAnimationFrame(() => {
+        slideRefs.current[next]?.scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
+      });
+      return next;
+    });
+  };
 
   const whatsappGenericMessage =
     "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.";
-  const whatsappGenericHref = buildWhatsAppUrl(tenant.whatsappNumber, whatsappGenericMessage);
+  const whatsappGenericHref = buildWhatsAppUrl(
+    tenant.whatsappNumber,
+    whatsappGenericMessage
+  );
 
   return (
     <section id="foto-unica" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
           <span
             className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
@@ -56,96 +127,136 @@ export default function IndividualGallery() {
           >
             {tenant.sectionFotoUnicaBadge || "Portfólio"}
           </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
+          <h2 className="font-sans text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl md:text-5xl">
             {tenant.sectionFotoUnicaTitle || "Foto Única"}
           </h2>
-          <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            {tenant.sectionFotoUnicaDesc || "Cada imagem carrega um instante decisivo, uma luz encontrada, uma emoção congelada no tempo. Disponíveis para impressão em fine art, com curadoria de acabamento e suporte sob medida para cada obra."}
-          </p>
-          <p className="font-sans text-stone-400 text-sm max-w-2xl mx-auto leading-relaxed mt-3">
-            {tenant.sectionFotoUnicaDesc2 || "Disponíveis em diferentes formatos, tamanhos e suportes com qualidade premium — papel fine art, canvas ou papel fotográfico."}
-          </p>
-          <div
-            className="w-12 h-0.5 mx-auto mt-6"
-            style={{ backgroundColor: tenant.colorPrimary }}
-          />
         </div>
 
-        {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`font-sans text-sm px-4 py-1.5 rounded-sm border transition-all duration-200 tracking-wide ${
-                activeCategory === cat
-                  ? "bg-stone-900 text-white border-stone-900"
-                  : "bg-white text-stone-600 border-stone-200 hover:border-stone-400 hover:text-stone-900"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Photo Grid - cuadradas uniformes */}
-        <motion.div
-          key={activeCategory}
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-60px" }}
-          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4"
-        >
-          {filtered.map((photo) => (
-            <Link
-              key={photo.id}
-              href={`${basePath}/foto/${photo.slug}${activeCategory !== "Todas" ? `?category=${encodeURIComponent(activeCategory)}` : ""}`}
-              className="block aspect-square"
-            >
-              <motion.div
-                variants={itemVariants}
-                className="gallery-item group relative overflow-hidden rounded-sm bg-stone-100 cursor-pointer h-full w-full"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
-                  alt={photo.title}
-                  className="block w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                  onContextMenu={(e) => e.preventDefault()}
-                />
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-3 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
-                  <p className="font-serif text-white text-sm font-medium leading-tight">
-                    {photo.title}
-                  </p>
-                  <p className="font-sans text-stone-300 text-xs mt-0.5 flex items-center gap-1">
-                    <MapPin size={10} />
-                    {photo.location}
-                  </p>
-                </div>
-                {/* Category badge */}
-                {photo.category && (
-                  <span className="absolute top-2 right-2 bg-black/60 text-white text-[10px] font-sans uppercase tracking-wider px-2 py-0.5 rounded-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                    {photo.category}
+        {categoriesWithPhotos.length === 0 ? (
+          <p className="text-center font-sans text-stone-500 text-sm">
+            Nenhuma categoria com fotos por enquanto.
+          </p>
+        ) : !selectedCategory ? (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5"
+          >
+            {displayedCategories.map((cat) => {
+              const ordered = photosForCategory(tenant.photos, cat);
+              const cover = ordered[0];
+              if (!cover) return null;
+              const img = cover.imageThumb || cover.imageSrc || "/placeholder.svg";
+              return (
+                <motion.button
+                  key={cat}
+                  type="button"
+                  variants={itemVariants}
+                  onClick={() => selectCategory(cat)}
+                  className="group relative overflow-hidden rounded-sm bg-stone-100 text-left aspect-[4/3] w-full cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-stone-400"
+                >
+                  <span className="absolute inset-x-0 top-0 z-20 bg-linear-to-b from-black/75 via-black/40 to-transparent px-4 pt-4 pb-10">
+                    <span className="font-sans text-xs uppercase tracking-[0.2em] font-semibold text-white drop-shadow-sm">
+                      {cat}
+                    </span>
                   </span>
-                )}
-              </motion.div>
-            </Link>
-          ))}
-        </motion.div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={img}
+                    alt=""
+                    className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors pointer-events-none" />
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        ) : (
+          <div className="space-y-8">
+            <div className="flex justify-center sm:justify-start">
+              <button
+                type="button"
+                onClick={clearCategory}
+                className="inline-flex items-center gap-2 font-sans text-sm text-stone-600 hover:text-stone-900 transition-colors"
+              >
+                <ChevronLeft size={18} className="shrink-0" />
+                Voltar às categorias
+              </button>
+            </div>
 
-        {/* Bottom CTA */}
+            <div className="relative">
+              <button
+                type="button"
+                aria-label="Anterior"
+                disabled={carouselPhotos.length <= 1}
+                onClick={() => goCarousel(-1)}
+                className="absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/95 shadow-md border border-stone-200 p-2 text-stone-800 hover:bg-white hidden sm:flex disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <ChevronLeft size={22} />
+              </button>
+              <button
+                type="button"
+                aria-label="Próximo"
+                disabled={carouselPhotos.length <= 1}
+                onClick={() => goCarousel(1)}
+                className="absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/95 shadow-md border border-stone-200 p-2 text-stone-800 hover:bg-white hidden sm:flex disabled:opacity-40 disabled:pointer-events-none"
+              >
+                <ChevronRight size={22} />
+              </button>
+
+              <div
+                ref={carouselRef}
+                className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2 [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-stone-300"
+              >
+                {carouselPhotos.map((photo, idx) => (
+                  <div
+                    key={photo.id}
+                    ref={(el) => {
+                      slideRefs.current[idx] = el;
+                    }}
+                    className="snap-center shrink-0 w-[min(100%,28rem)] sm:w-[26rem]"
+                  >
+                    <Link
+                      href={`${basePath}/foto/${photo.slug}?category=${encodeURIComponent(selectedCategory)}`}
+                      className="block group"
+                    >
+                      <div className="relative aspect-[4/3] overflow-hidden rounded-sm bg-stone-100">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={
+                            photo.imageThumb ||
+                            photo.imageSrc ||
+                            "/placeholder.svg"
+                          }
+                          alt={photo.title}
+                          className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          onContextMenu={(e) => e.preventDefault()}
+                        />
+                      </div>
+                      <p className="mt-3 text-center font-sans text-base font-medium text-stone-900 transition-colors group-hover:text-stone-600">
+                        {photo.title}
+                      </p>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="text-center mt-12 md:mt-16">
           <p className="font-sans text-stone-500 text-sm mb-4">
-            {tenant.sectionFotoUnicaSubtext || "Valores e formatos combinados diretamente via WhatsApp"}
+            {tenant.sectionFotoUnicaSubtext ||
+              "Valores e formatos combinados diretamente via WhatsApp"}
           </p>
           <a
             href={whatsappGenericHref}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-white font-sans font-semibold text-sm px-6 py-3 rounded-sm tracking-wide transition-colors duration-200"
+            className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-white shadow-md shadow-black/10 transition-[filter,transform] hover:brightness-105 active:scale-[0.99]"
             style={{ backgroundColor: tenant.colorCta }}
           >
             <WhatsAppIcon size={15} />

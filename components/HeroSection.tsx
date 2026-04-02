@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { useTenant } from "@/components/TenantProvider";
 import { ChevronDown } from "lucide-react";
-import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 export default function HeroSection() {
   const tenant = useTenant();
@@ -12,9 +10,8 @@ export default function HeroSection() {
   return (
     <section
       id="inicio"
-      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative flex min-h-screen w-full items-center justify-center overflow-hidden"
     >
-      {/* Background image */}
       <div className="absolute inset-0">
         <Image
           src={tenant.heroImage}
@@ -24,30 +21,26 @@ export default function HeroSection() {
           priority
           sizes="100vw"
         />
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-b from-black/50 via-black/30 to-black/70" />
-        <div className="absolute inset-0 bg-linear-to-r from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/40 to-black/72" />
+        <div className="absolute inset-0 bg-linear-to-r from-black/45 via-black/15 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-black/15" />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center pt-20">
-        <div className="max-w-3xl mx-auto">
-          {/* Badge */}
+      <div className="relative z-10 mx-auto max-w-5xl px-4 pt-20 text-center sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-3xl">
           <div
-            className="flex items-center justify-center gap-2 text-white text-xs font-sans uppercase tracking-[0.2em] px-4 py-1.5 rounded-sm mb-6 md:mb-8 mx-auto w-fit"
-            style={{ backgroundColor: `${tenant.colorPrimary}E6` }}
+            className="mx-auto mb-6 flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-sans font-medium uppercase tracking-[0.18em] text-white/95 md:mb-8 md:px-5 md:py-2 md:text-[11px] md:tracking-[0.22em]"
+            style={{ backgroundColor: `${tenant.colorPrimary}D9` }}
           >
-            <span className="w-1.5 h-1.5 bg-white rounded-full" />
+            <span className="size-1.5 shrink-0 rounded-full bg-white/90" />
             {tenant.heroBadge}
           </div>
 
-          {/* Headline */}
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white font-semibold leading-tight mb-4 md:mb-6">
+          <h1 className="mb-4 font-sans text-4xl font-semibold leading-[1.14] tracking-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl sm:leading-[1.12] md:mb-6 md:text-6xl lg:text-7xl">
             {tenant.heroTitle}
           </h1>
 
-          {/* Subtext */}
-          <div className="font-sans text-stone-300 text-base sm:text-lg md:text-xl leading-relaxed mb-8 md:mb-10 max-w-2xl mx-auto space-y-4">
+          <div className="mx-auto mb-10 max-w-2xl space-y-4 font-sans text-base leading-relaxed text-stone-100/95 drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)] sm:text-lg md:mb-12 md:text-xl md:leading-relaxed">
             {tenant.heroSubtitle
               .split(/\n\n+/)
               .map((p) => p.trim())
@@ -59,40 +52,20 @@ export default function HeroSection() {
               ))}
           </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-stretch sm:items-center">
-            <a
-              href={buildWhatsAppUrl(tenant.whatsappNumber, "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico.")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-sans font-semibold text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm tracking-wide transition-all duration-200 shadow-lg shadow-green-900/30 hover:shadow-xl hover:shadow-green-900/40 hover:-translate-y-0.5"
-            >
-              <WhatsAppIcon size={18} />
-              {tenant.heroCtaWhatsApp || "Fale pelo WhatsApp"}
-            </a>
-            <a
-              href="#foto-unica"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById("foto-unica")?.scrollIntoView({ behavior: "smooth" });
-              }}
-              className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white font-sans font-medium text-sm sm:text-base px-6 sm:px-8 py-3.5 sm:py-4 rounded-sm tracking-wide transition-all duration-200 border border-white/20 hover:border-white/40"
-            >
-              {tenant.heroCtaPortfolio || "Ver Portfólio"}
-            </a>
-          </div>
-
-          {/* Scroll indicator */}
           <a
             href="#foto-unica"
             onClick={(e) => {
               e.preventDefault();
-              document.getElementById("foto-unica")?.scrollIntoView({ behavior: "smooth" });
+              document
+                .getElementById("foto-unica")
+                ?.scrollIntoView({ behavior: "smooth" });
             }}
-            className="mt-12 md:mt-16 flex justify-center"
+            className="flex justify-center"
             aria-label={tenant.heroScrollLabel || "Rolar para ver o portfólio"}
           >
-            <ChevronDown size={24} className="text-stone-500 hover:text-stone-300 transition-colors animate-bounce" />
+            <span className="flex size-10 items-center justify-center rounded-full border border-white/15 bg-white/5 text-white/55 backdrop-blur-sm transition-colors hover:border-white/25 hover:text-white/90">
+              <ChevronDown size={22} strokeWidth={1.75} />
+            </span>
           </a>
         </div>
       </div>

@@ -6,10 +6,10 @@ import { useTenant } from "@/components/TenantProvider";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const navLinks = [
-  { label: "Início", hash: "#inicio" },
   { label: "Fotografia Única", hash: "#foto-unica" },
   { label: "Séries", hash: "#series" },
   { label: "Sobre", hash: "#sobre" },
+  { label: "Contato", hash: "#contato" },
 ];
 
 export default function Footer() {
@@ -27,29 +27,27 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-stone-950 border-t border-stone-800">
-      {/* Main footer content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-          {/* Brand column */}
+    <footer className="border-t border-stone-800/90 bg-stone-950">
+      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 md:py-16 lg:px-8">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-12 lg:grid-cols-4 lg:gap-14">
           <div className="sm:col-span-2 lg:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
+            <div className="mb-4 flex items-center gap-2.5">
               <Camera size={20} style={{ color: tenant.colorPrimary }} />
               <div>
-                <p className="font-serif text-white font-semibold text-lg">
+                <p className="font-sans text-lg font-semibold tracking-tight text-white">
                   {tenant.name}
                 </p>
-                <p className="font-sans text-stone-500 text-[10px] uppercase tracking-[0.2em]">
-                  Fotografia
+                <p className="font-sans text-[10px] uppercase tracking-[0.2em] text-stone-500">
+                  {tenant.subtitle}
                 </p>
               </div>
             </div>
-            <p className="font-sans text-stone-500 text-sm leading-relaxed">
-              Fotografia autoral de {tenant.name}. Arte para impressão, coleção e decoração.
+            <p className="font-sans text-sm leading-relaxed text-stone-500">
+              Fotografia autoral de {tenant.name}. Arte para impressão, coleção e
+              decoração.
             </p>
-            {/* Social links */}
             {socialLinks.length > 0 && (
-              <div className="flex items-center gap-3 mt-5">
+              <div className="mt-5 flex items-center gap-2">
                 {socialLinks.map((s) => (
                   <a
                     key={s.label}
@@ -57,7 +55,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
-                    className="w-9 h-9 flex items-center justify-center rounded-sm bg-stone-800 hover:bg-stone-700 text-stone-400 hover:text-white transition-colors duration-200"
+                    className="flex size-10 items-center justify-center rounded-xl bg-stone-800/80 text-stone-400 transition-colors hover:bg-stone-700 hover:text-white"
                   >
                     <s.icon size={16} />
                   </a>
@@ -66,17 +64,16 @@ export default function Footer() {
             )}
           </div>
 
-          {/* Navigation */}
           <div>
-            <h4 className="font-sans text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h4 className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">
               Navegação
             </h4>
-            <ul className="space-y-2.5">
+            <ul className="space-y-1">
               {navLinks.map((link) => (
                 <li key={link.hash}>
                   <a
                     href={`${homeHref}${link.hash}`}
-                    className="font-sans text-stone-400 hover:text-white text-sm transition-colors duration-200"
+                    className="inline-block rounded-md py-1.5 font-sans text-sm text-stone-400 transition-colors hover:text-white"
                   >
                     {link.label}
                   </a>
@@ -85,9 +82,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Info */}
           <div>
-            <h4 className="font-sans text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h4 className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">
               Informações
             </h4>
             <ul className="space-y-2.5">
@@ -109,9 +105,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
-            <h4 className="font-sans text-white font-semibold text-sm uppercase tracking-wider mb-4">
+            <h4 className="mb-4 font-sans text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-500">
               Contato
             </h4>
             <div className="space-y-3">
@@ -119,29 +114,24 @@ export default function Footer() {
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 text-stone-400 hover:text-white transition-colors duration-200 group"
+                className="flex items-center gap-2.5 text-stone-400 transition-colors hover:text-white"
               >
-                <WhatsAppIcon
-                  size={15}
-                  className="text-[#25D366] shrink-0"
-                />
+                <WhatsAppIcon size={15} className="shrink-0 text-[#25D366]" />
                 <span className="font-sans text-sm">WhatsApp</span>
               </a>
               {tenant.email && (
                 <a
                   href={`mailto:${tenant.email}`}
-                  className="flex items-center gap-2.5 text-stone-400 hover:text-white transition-colors duration-200"
+                  className="flex items-center gap-2.5 text-stone-400 transition-colors hover:text-white"
                 >
-                  <Mail size={15} className="text-stone-500 shrink-0" />
-                  <span className="font-sans text-sm">
-                    {tenant.email}
-                  </span>
+                  <Mail size={15} className="shrink-0 text-stone-500" />
+                  <span className="font-sans text-sm">{tenant.email}</span>
                 </a>
               )}
             </div>
 
-            <div className="mt-5 bg-stone-900 border border-stone-800 rounded-sm p-3">
-              <p className="font-sans text-stone-500 text-xs leading-relaxed">
+            <div className="mt-6 rounded-xl border border-stone-800/90 bg-stone-900/50 p-4">
+              <p className="font-sans text-xs leading-relaxed text-stone-500">
                 Direitos autorais reservados. Reprodução ou uso não autorizado
                 das imagens é proibido por lei.
               </p>
@@ -150,13 +140,12 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-stone-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p className="font-sans text-stone-600 text-xs">
-            © {year} {tenant.name} Fotografia. Todos os direitos reservados.
+      <div className="border-t border-stone-800/80">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 sm:flex-row sm:px-6 lg:px-8">
+          <p className="text-center font-sans text-xs text-stone-600 sm:text-left">
+            © {year} {tenant.name}. Todos os direitos reservados.
           </p>
-          <p className="font-sans text-stone-700 text-xs">
+          <p className="text-center font-sans text-xs text-stone-600 sm:text-right">
             Porto Alegre · Rio Grande do Sul · Brasil
           </p>
         </div>
