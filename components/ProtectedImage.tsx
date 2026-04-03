@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { X, ZoomIn } from "lucide-react";
+import { shouldOptimizeNextImage } from "@/lib/should-optimize-image";
 
 interface Props {
   src: string;
@@ -10,22 +12,26 @@ interface Props {
 
 export default function ProtectedImage({ src, alt }: Props) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const optimized = shouldOptimizeNextImage(src);
 
   return (
     <>
       <div
-        className="group relative w-full cursor-pointer overflow-hidden rounded-2xl bg-stone-200/50 ring-1 ring-stone-200/90 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.25)] transition-shadow hover:shadow-[0_24px_56px_-24px_rgba(0,0,0,0.3)]"
+        className="group relative w-full cursor-pointer overflow-hidden rounded-sm bg-stone-200/50 ring-1 ring-stone-200/80 shadow-[0_12px_40px_-20px_rgba(0,0,0,0.2)] transition-shadow hover:shadow-[0_16px_44px_-20px_rgba(0,0,0,0.24)]"
         onClick={() => setLightboxOpen(true)}
         role="button"
         tabIndex={0}
         onKeyDown={(e) => e.key === "Enter" && setLightboxOpen(true)}
         aria-label="Ampliar imagem"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <Image
           src={src}
           alt={alt}
+          width={1920}
+          height={1280}
+          sizes="(max-width: 1152px) 100vw, 1152px"
           className="mx-auto block h-auto max-h-[min(85vh,1080px)] w-full max-w-full object-contain"
+          unoptimized={!optimized}
           onContextMenu={(e) => e.preventDefault()}
         />
         <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -51,11 +57,14 @@ export default function ProtectedImage({ src, alt }: Props) {
           <p className="absolute left-4 top-4 z-10 max-w-[min(90vw,24rem)] truncate text-left text-xs font-medium text-white/70">
             {alt}
           </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={src}
             alt={alt}
+            width={2400}
+            height={1600}
+            sizes="100vw"
             className="max-h-[min(92vh,1600px)] max-w-full object-contain"
+            unoptimized={!optimized}
             onClick={(e) => e.stopPropagation()}
             onContextMenu={(e) => e.preventDefault()}
           />

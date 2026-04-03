@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getTenantFromHeaders } from "@/lib/tenant";
-import { TenantProvider } from "@/components/TenantProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PhotoDetailPageContent from "@/components/PhotoDetailPageContent";
@@ -12,7 +11,8 @@ export default async function SeriePhotoPage({
 }: {
   params: Promise<{ seriesSlug: string; photoId: string }>;
 }) {
-  const { seriesSlug, photoId } = await params;
+  const { seriesSlug, photoId: rawPhotoId } = await params;
+  const photoId = decodeURIComponent(rawPhotoId).trim();
   const headersList = await headers();
   const tenant = await getTenantFromHeaders(headersList);
 
@@ -21,16 +21,18 @@ export default async function SeriePhotoPage({
   const serie = tenant.series.find((s) => s.slug === seriesSlug);
   if (!serie) notFound();
 
-  const photo = serie.photos.find(
-    (p) => p.id === photoId || (p as { id?: string }).id === photoId
-  );
+  const photo = serie.photos.find((p) => p.id === photoId);
   if (!photo) notFound();
 
   const whatsappMsg = `Olá, tenho interesse na foto "${photo.title}" (série ${serie.title}). Poderia me passar mais informações sobre valores e formatos disponíveis?`;
   const whatsappLink = buildWhatsAppUrl(tenant.whatsappNumber, whatsappMsg);
 
+  const pathSlug = headersList.get("x-tenant-slug")?.trim();
+  const homePath = pathSlug ? `/${pathSlug}` : "/";
+  const backHref = `${homePath}#series`;
+
   return (
-    <TenantProvider tenant={tenant}>
+    <>
       <Header />
       <PhotoDetailPageContent
         colorPrimary={tenant.colorPrimary}
@@ -46,10 +48,10 @@ export default async function SeriePhotoPage({
         printType={null}
         price={null}
         whatsappLink={whatsappLink}
-        backHref="/#series"
+        backHref={backHref}
         backLabel="Voltar para série"
       />
       <Footer />
-    </TenantProvider>
+    </>
   );
 }

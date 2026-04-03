@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/auth";
+import { revalidateTenantPublic } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/slugify";
 
 async function ensurePhotoForSeries(
@@ -162,5 +163,6 @@ export async function DELETE(
 
   const { id } = await params;
   await prisma.series.delete({ where: { id } });
+  revalidateTenantPublic();
   return NextResponse.json({ success: true });
 }

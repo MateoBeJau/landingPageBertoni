@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPanelSession } from "@/lib/auth";
+import { revalidateTenantPublic } from "@/lib/revalidate-public";
 
 export async function GET() {
   const session = await getPanelSession();
@@ -97,6 +98,7 @@ export async function PUT(req: NextRequest) {
       },
     });
 
+    revalidateTenantPublic();
     return NextResponse.json({ tenant });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Erro ao atualizar perfil";

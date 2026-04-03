@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getTenantFromHeaders } from "@/lib/tenant";
-import { TenantProvider } from "@/components/TenantProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PhotoDetailPageContent from "@/components/PhotoDetailPageContent";
@@ -14,26 +13,33 @@ export default async function PhotoPageByPath({
   params: Promise<{ slug: string; photoSlug: string }>;
   searchParams: Promise<{ category?: string }>;
 }) {
-  const { photoSlug } = await params;
+  const { slug: tenantPathSlug, photoSlug: rawPhotoSlug } = await params;
+  const photoSlug = decodeURIComponent(rawPhotoSlug).trim();
   const { category } = await searchParams;
   const headersList = await headers();
   const tenant = await getTenantFromHeaders(headersList);
 
   if (!tenant) notFound();
 
-  const photo = tenant.photos.find((p) => p.slug === photoSlug);
+  if (tenant.slug.toLowerCase() !== tenantPathSlug.toLowerCase()) {
+    notFound();
+  }
+
+  const photo =
+    tenant.photos.find((p) => p.slug === photoSlug) ||
+    tenant.photos.find((p) => p.id === photoSlug);
   if (!photo) notFound();
 
   const whatsappMsg = `Olá, tenho interesse na foto "${photo.title}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`;
   const whatsappLink = buildWhatsAppUrl(tenant.whatsappNumber, whatsappMsg);
 
-  const basePath = `/${tenant.slug}`;
+  const basePath = `/${tenantPathSlug}`;
   const backHref = category
     ? `${basePath}?category=${encodeURIComponent(category)}#foto-unica`
     : `${basePath}#foto-unica`;
 
   return (
-    <TenantProvider tenant={tenant}>
+    <>
       <Header />
       <PhotoDetailPageContent
         colorPrimary={tenant.colorPrimary}
@@ -53,6 +59,6 @@ export default async function PhotoPageByPath({
         backLabel="Voltar para galeria"
       />
       <Footer />
-    </TenantProvider>
+    </>
   );
 }

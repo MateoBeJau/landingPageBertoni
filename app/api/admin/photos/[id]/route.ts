@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/auth";
+import { revalidateTenantPublic } from "@/lib/revalidate-public";
 
 export async function PUT(
   req: NextRequest,
@@ -32,6 +33,7 @@ export async function PUT(
         active: data.active,
       },
     });
+    revalidateTenantPublic();
     return NextResponse.json({ photo });
   } catch (e: unknown) {
     const message =
@@ -50,5 +52,6 @@ export async function DELETE(
 
   const { id } = await params;
   await prisma.photo.delete({ where: { id } });
+  revalidateTenantPublic();
   return NextResponse.json({ success: true });
 }

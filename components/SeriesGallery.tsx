@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import Link from "next/link";
+import { shouldOptimizeNextImage } from "@/lib/should-optimize-image";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { motion, AnimatePresence, Variants } from "framer-motion";
@@ -40,43 +42,92 @@ function SeriesModal({
     .filter((p) => p.imageSrc || p.imageThumb)
     .map((p, i) => ({ src: p.imageSrc || p.imageThumb, alt: p.title || `Photo ${i + 1}` }));
 
-  // Resolve detail URL: gallery photo slug, or null for serie-only (we use serie route)
-  const getGallerySlug = (photo: (typeof displayPhotos)[number]) => {
-    if ("slug" in photo && photo.slug) return photo.slug;
-    const byUrl = tenant.photos.find(
-      (p) =>
-        p.imageSrc === photo.imageSrc ||
-        p.imageSrc === photo.imageThumb ||
-        p.imageThumb === photo.imageSrc ||
-        p.imageThumb === photo.imageThumb
-    );
-    if (byUrl) return byUrl.slug;
+  /** Foto da galeria individual (slug + categoria para URL igual ao carrossel). */
+  const resolveGalleryPhoto = (
+    photo: (typeof displayPhotos)[number]
+  ): { slug: string; category: string | null } | null => {
+    const linkedSlug =
+      "slug" in photo && photo.slug && String(photo.slug).trim()
+        ? String(photo.slug).trim()
+        : null;
+    if (linkedSlug) {
+      const p = tenant.photos.find((x) => x.slug === linkedSlug);
+      return {
+        slug: linkedSlug,
+        category: p?.category?.trim() ? p.category : null,
+      };
+    }
+    const spSrc = (photo.imageSrc || "").trim();
+    const spThumb = (photo.imageThumb || "").trim();
+    const srcOk = spSrc.length > 0 && spSrc !== "/placeholder.svg";
+    const thumbOk = spThumb.length > 0 && spThumb !== "/placeholder.svg";
+    const hasUsableUrl = srcOk || thumbOk;
+    const byUrl = hasUsableUrl
+      ? tenant.photos.find(
+          (p) =>
+            p.imageSrc === photo.imageSrc ||
+            p.imageSrc === photo.imageThumb ||
+            p.imageThumb === photo.imageSrc ||
+            p.imageThumb === photo.imageThumb
+        )
+      : undefined;
+    if (byUrl?.slug?.trim()) {
+      return {
+        slug: byUrl.slug.trim(),
+        category: byUrl.category?.trim() ? byUrl.category : null,
+      };
+    }
+    const photoTitle = photo.title?.trim() || "";
+    if (!photoTitle) return null;
     const byTitleLocation = tenant.photos.find((p) => {
-      if (p.title.trim().toLowerCase() !== photo.title.trim().toLowerCase()) return false;
+      if (p.title.trim().toLowerCase() !== photoTitle.toLowerCase()) return false;
       const pLoc = p.location?.trim().toLowerCase() || "";
       const sLoc = photo.location?.trim().toLowerCase() || "";
       return !pLoc || !sLoc || pLoc === sLoc;
     });
-    return byTitleLocation?.slug ?? null;
+    if (!byTitleLocation?.slug?.trim()) return null;
+    return {
+      slug: byTitleLocation.slug.trim(),
+      category: byTitleLocation.category?.trim()
+        ? byTitleLocation.category
+        : null,
+    };
   };
 
-  // Every photo goes to detail: gallery page or serie photo page (never lightbox on click)
   const getDetailHref = (photo: (typeof displayPhotos)[number]) => {
-    const gallerySlug = getGallerySlug(photo);
     const basePath = tenant.basePath || "";
-    if (gallerySlug) return `${basePath}/foto/${gallerySlug}`;
-    // Serie-only photo: use serie detail route
+    const g = resolveGalleryPhoto(photo);
+    if (g?.slug?.trim()) {
+      const slug = g.slug.trim();
+      const existsInGallery = tenant.photos.some((p) => p.slug === slug);
+      if (existsInGallery) {
+        const q = g.category
+          ? `?category=${encodeURIComponent(g.category)}`
+          : "";
+        return `${basePath}/foto/${slug}${q}`;
+      }
+    }
     if (photo.id && photo.id !== "cover") {
       return `${basePath}/serie/${serie.slug}/foto/${photo.id}`;
     }
-    return null; // synthetic cover fallback
+    return null;
   };
 
-  // Lock body scroll while modal is open
+  // Bloquear scroll; restaurar main tras un retardo para evitar mouseup en "Foto única".
   useEffect(() => {
-    const prev = document.body.style.overflow;
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    const mainEl = document.querySelector("main");
+    const prevMainPe = mainEl?.style.pointerEvents ?? "";
+    if (mainEl) mainEl.style.pointerEvents = "none";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.setTimeout(() => {
+        if (!document.querySelector("[data-series-modal-root]") && mainEl) {
+          mainEl.style.pointerEvents = prevMainPe;
+        }
+      }, 320);
+    };
   }, []);
 
   // Close on Escape key
@@ -89,14 +140,15 @@ function SeriesModal({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  return (
+  return createPortal(
     <AnimatePresence>
       <motion.div
         key="series-modal"
+        data-series-modal-root
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm overflow-y-auto"
+        className="fixed inset-0 z-[110] bg-black/95 backdrop-blur-sm overflow-y-auto"
         onClick={(e) => e.target === e.currentTarget && onClose()}
       >
         <div className="min-h-screen py-8 px-4 sm:px-6">
@@ -143,7 +195,9 @@ function SeriesModal({
                       sizes="(max-width: 640px) 50vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       onContextMenu={(e) => e.preventDefault()}
-                      unoptimized={(photo.imageThumb || photo.imageSrc || "").includes("blob.vercel-storage.com")}
+                      unoptimized={!shouldOptimizeNextImage(
+                        photo.imageThumb || photo.imageSrc || "/placeholder.svg"
+                      )}
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="absolute bottom-0 left-0 right-0 p-3 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
@@ -249,7 +303,8 @@ function SeriesModal({
           },
         }}
       />
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
@@ -271,15 +326,14 @@ export default function SeriesGallery() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12 md:mb-16">
-          <span className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3" style={{ color: tenant.colorPrimary }}>
-            {tenant.sectionSeriesBadge || "Séries"}
-          </span>
-          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold mb-4">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-semibold">
             {tenant.sectionSeriesTitle || "Séries Fotográficas"}
           </h2>
-          <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-            {tenant.sectionSeriesDesc || "Conjuntos de imagens que exploram um tema em profundidade — seja a luz de um lugar, a geometria urbana ou as texturas do tempo. Cada série é uma imersão poética, disponível em impressões avulsas ou como coleção para ambientes que pedem uma história visual coesa."}
-          </p>
+          {tenant.sectionSeriesDesc ? (
+            <p className="font-sans text-stone-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed mt-4">
+              {tenant.sectionSeriesDesc}
+            </p>
+          ) : null}
           <div className="w-12 h-0.5 mx-auto mt-6" style={{ backgroundColor: tenant.colorPrimary }} />
         </div>
 
@@ -306,7 +360,7 @@ export default function SeriesGallery() {
                     sizes="(max-width: 640px) 100vw, 50vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     onContextMenu={(e) => e.preventDefault()}
-                    unoptimized={serie.cover.includes("blob.vercel-storage.com")}
+                    unoptimized={!shouldOptimizeNextImage(serie.cover)}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-stone-400">
@@ -350,16 +404,14 @@ export default function SeriesGallery() {
         </div>
       </div>
 
-      {/* Series Modal */}
-      <AnimatePresence>
-        {selectedSeries && (
-          <SeriesModal
-            serie={selectedSeries}
-            tenant={tenant}
-            onClose={() => setSelectedSeries(null)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Modal no portal (evita cliques a atravessar para Foto única) */}
+      {selectedSeries ? (
+        <SeriesModal
+          serie={selectedSeries}
+          tenant={tenant}
+          onClose={() => setSelectedSeries(null)}
+        />
+      ) : null}
     </section>
   );
 }

@@ -1,78 +1,60 @@
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { prisma } from "./prisma";
 import { TenantConfig } from "./types";
+import { TENANT_PUBLIC_TAG } from "./revalidate-public";
 
-export async function getTenantByDomain(
-  hostname: string
-): Promise<TenantConfig | null> {
-  const cleanHost = hostname.replace(/:\d+$/, "").toLowerCase();
-  const withoutWww = cleanHost.startsWith("www.") ? cleanHost.slice(4) : cleanHost;
-
-  const tenant = await prisma.tenant.findFirst({
-    where: {
-      active: true,
-      OR: [
-        { domain: cleanHost },
-        { domain: withoutWww },
-        { slug: withoutWww.split(".")[0] },
-      ],
-    },
+const tenantPublicInclude = {
+  photos: {
+    where: { active: true },
+    orderBy: { order: "asc" as const },
+  },
+  series: {
+    where: { active: true },
+    orderBy: { order: "asc" as const },
     include: {
       photos: {
-        where: { active: true },
-        orderBy: { order: "asc" },
-      },
-      series: {
-        where: { active: true },
-        orderBy: { order: "asc" },
-        include: {
-          photos: {
-            orderBy: { order: "asc" },
-            include: { photo: true },
-          },
-        },
-      },
-      ensaios: {
-        where: { active: true },
-        orderBy: { order: "asc" },
+        orderBy: { order: "asc" as const },
+        include: { photo: true },
       },
     },
-  });
+  },
+  ensaios: {
+    where: { active: true },
+    orderBy: { order: "asc" as const },
+  },
+};
 
-  if (!tenant) return null;
+async function fetchTenantRowFromDb(host: string, pathSlug: string) {
+  const trimmedHost = host.trim();
+  if (trimmedHost) {
+    const cleanHost = trimmedHost.replace(/:\d+$/, "").toLowerCase();
+    const withoutWww = cleanHost.startsWith("www.")
+      ? cleanHost.slice(4)
+      : cleanHost;
 
-  return mapTenantToConfig(tenant);
-}
-
-export async function getTenantBySlug(
-  slug: string
-): Promise<TenantConfig | null> {
-  const tenant = await prisma.tenant.findFirst({
-    where: { active: true, slug: slug.trim().toLowerCase() },
-    include: {
-      photos: {
-        where: { active: true },
-        orderBy: { order: "asc" },
+    const tenant = await prisma.tenant.findFirst({
+      where: {
+        active: true,
+        OR: [
+          { domain: cleanHost },
+          { domain: withoutWww },
+          { slug: withoutWww.split(".")[0] },
+        ],
       },
-      series: {
-        where: { active: true },
-        orderBy: { order: "asc" },
-        include: {
-          photos: {
-            orderBy: { order: "asc" },
-            include: { photo: true },
-          },
-        },
-      },
-      ensaios: {
-        where: { active: true },
-        orderBy: { order: "asc" },
-      },
-    },
-  });
+      include: tenantPublicInclude,
+    });
+    if (tenant) return tenant;
+  }
 
-  if (!tenant) return null;
+  if (pathSlug.trim()) {
+    return prisma.tenant.findFirst({
+      where: { active: true, slug: pathSlug.trim().toLowerCase() },
+      include: tenantPublicInclude,
+    });
+  }
 
-  return mapTenantToConfig(tenant);
+  return null;
 }
 
 function mapTenantToConfig(tenant: {
@@ -186,44 +168,91 @@ function mapTenantToConfig(tenant: {
       { value: tenant.stat4Value, label: tenant.stat4Label },
     ],
     categories: (() => {
-      const fromTenant = tenant.categories.split(",").map((c) => c.trim()).filter(Boolean);
-      const fromPhotos = tenant.photos.map((p) => p.category).filter((c): c is string => !!c?.trim());
+      const fromTenant = tenant.categories
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean);
+      const fromPhotos = tenant.photos
+        .map((p) => p.category)
+        .filter((c): c is string => !!c?.trim());
       return [...new Set([...fromTenant, ...fromPhotos])].sort();
     })(),
     instagramUrl: tenant.instagramUrl,
     facebookUrl: tenant.facebookUrl,
     metaTitle: tenant.metaTitle,
     metaDescription: tenant.metaDescription,
-    sectionFotoUnicaBadge: String((tenant as Record<string, unknown>).sectionFotoUnicaBadge ?? "") || null,
-    sectionFotoUnicaTitle: String((tenant as Record<string, unknown>).sectionFotoUnicaTitle ?? "") || null,
-    sectionFotoUnicaDesc: String((tenant as Record<string, unknown>).sectionFotoUnicaDesc ?? "") || null,
-    sectionFotoUnicaDesc2: String((tenant as Record<string, unknown>).sectionFotoUnicaDesc2 ?? "") || null,
-    sectionFotoUnicaCta: String((tenant as Record<string, unknown>).sectionFotoUnicaCta ?? "") || null,
-    sectionFotoUnicaSubtext: String((tenant as Record<string, unknown>).sectionFotoUnicaSubtext ?? "") || null,
-    sectionSeriesBadge: String((tenant as Record<string, unknown>).sectionSeriesBadge ?? "") || null,
-    sectionSeriesTitle: String((tenant as Record<string, unknown>).sectionSeriesTitle ?? "") || null,
-    sectionSeriesDesc: String((tenant as Record<string, unknown>).sectionSeriesDesc ?? "") || null,
-    sectionSeriesModalLabel: String((tenant as Record<string, unknown>).sectionSeriesModalLabel ?? "") || null,
-    sectionSeriesVerSerie: String((tenant as Record<string, unknown>).sectionSeriesVerSerie ?? "") || null,
-    sectionSeriesClique: String((tenant as Record<string, unknown>).sectionSeriesClique ?? "") || null,
-    sectionEnsaiosBadge: String((tenant as Record<string, unknown>).sectionEnsaiosBadge ?? "") || null,
-    sectionEnsaiosTitle: String((tenant as Record<string, unknown>).sectionEnsaiosTitle ?? "") || null,
-    sectionEnsaiosDesc: String((tenant as Record<string, unknown>).sectionEnsaiosDesc ?? "") || null,
-    sectionEnsaiosCta: String((tenant as Record<string, unknown>).sectionEnsaiosCta ?? "") || null,
-    sectionEnsaiosCtaSubtext: String((tenant as Record<string, unknown>).sectionEnsaiosCtaSubtext ?? "") || null,
-    heroCtaWhatsApp: String((tenant as Record<string, unknown>).heroCtaWhatsApp ?? "") || null,
-    heroCtaPortfolio: String((tenant as Record<string, unknown>).heroCtaPortfolio ?? "") || null,
-    heroScrollLabel: String((tenant as Record<string, unknown>).heroScrollLabel ?? "") || null,
+    sectionFotoUnicaBadge:
+      String((tenant as Record<string, unknown>).sectionFotoUnicaBadge ?? "") ||
+      null,
+    sectionFotoUnicaTitle:
+      String((tenant as Record<string, unknown>).sectionFotoUnicaTitle ?? "") ||
+      null,
+    sectionFotoUnicaDesc:
+      String((tenant as Record<string, unknown>).sectionFotoUnicaDesc ?? "") ||
+      null,
+    sectionFotoUnicaDesc2:
+      String((tenant as Record<string, unknown>).sectionFotoUnicaDesc2 ?? "") ||
+      null,
+    sectionFotoUnicaCta:
+      String((tenant as Record<string, unknown>).sectionFotoUnicaCta ?? "") ||
+      null,
+    sectionFotoUnicaSubtext:
+      String((tenant as Record<string, unknown>).sectionFotoUnicaSubtext ?? "") ||
+      null,
+    sectionSeriesBadge:
+      String((tenant as Record<string, unknown>).sectionSeriesBadge ?? "") ||
+      null,
+    sectionSeriesTitle:
+      String((tenant as Record<string, unknown>).sectionSeriesTitle ?? "") || null,
+    sectionSeriesDesc:
+      String((tenant as Record<string, unknown>).sectionSeriesDesc ?? "") || null,
+    sectionSeriesModalLabel:
+      String((tenant as Record<string, unknown>).sectionSeriesModalLabel ?? "") ||
+      null,
+    sectionSeriesVerSerie:
+      String((tenant as Record<string, unknown>).sectionSeriesVerSerie ?? "") ||
+      null,
+    sectionSeriesClique:
+      String((tenant as Record<string, unknown>).sectionSeriesClique ?? "") ||
+      null,
+    sectionEnsaiosBadge:
+      String((tenant as Record<string, unknown>).sectionEnsaiosBadge ?? "") ||
+      null,
+    sectionEnsaiosTitle:
+      String((tenant as Record<string, unknown>).sectionEnsaiosTitle ?? "") ||
+      null,
+    sectionEnsaiosDesc:
+      String((tenant as Record<string, unknown>).sectionEnsaiosDesc ?? "") ||
+      null,
+    sectionEnsaiosCta:
+      String((tenant as Record<string, unknown>).sectionEnsaiosCta ?? "") || null,
+    sectionEnsaiosCtaSubtext:
+      String((tenant as Record<string, unknown>).sectionEnsaiosCtaSubtext ?? "") ||
+      null,
+    heroCtaWhatsApp:
+      String((tenant as Record<string, unknown>).heroCtaWhatsApp ?? "") || null,
+    heroCtaPortfolio:
+      String((tenant as Record<string, unknown>).heroCtaPortfolio ?? "") || null,
+    heroScrollLabel:
+      String((tenant as Record<string, unknown>).heroScrollLabel ?? "") || null,
     contactCta: String((tenant as Record<string, unknown>).contactCta ?? "") || null,
-    contactSubtext: String((tenant as Record<string, unknown>).contactSubtext ?? "") || null,
-    aboutSectionLabel: String((tenant as Record<string, unknown>).aboutSectionLabel ?? "") || null,
+    contactSubtext:
+      String((tenant as Record<string, unknown>).contactSubtext ?? "") || null,
+    aboutSectionLabel:
+      String((tenant as Record<string, unknown>).aboutSectionLabel ?? "") || null,
     aboutYears: String((tenant as Record<string, unknown>).aboutYears ?? "") || null,
-    aboutYearsLabel: String((tenant as Record<string, unknown>).aboutYearsLabel ?? "") || null,
-    aboutCtaContact: String((tenant as Record<string, unknown>).aboutCtaContact ?? "") || null,
-    aboutCtaPortfolio: String((tenant as Record<string, unknown>).aboutCtaPortfolio ?? "") || null,
-    aboutHighlights: (Array.isArray((tenant as Record<string, unknown>).aboutHighlights)
-      ? (tenant as Record<string, unknown>).aboutHighlights as Array<{ label: string; desc: string }>
-      : null),
+    aboutYearsLabel:
+      String((tenant as Record<string, unknown>).aboutYearsLabel ?? "") || null,
+    aboutCtaContact:
+      String((tenant as Record<string, unknown>).aboutCtaContact ?? "") || null,
+    aboutCtaPortfolio:
+      String((tenant as Record<string, unknown>).aboutCtaPortfolio ?? "") || null,
+    aboutHighlights: Array.isArray((tenant as Record<string, unknown>).aboutHighlights)
+      ? ((tenant as Record<string, unknown>).aboutHighlights as Array<{
+          label: string;
+          desc: string;
+        }>)
+      : null,
     photos: tenant.photos.map((p) => ({
       id: p.id,
       title: p.title,
@@ -271,15 +300,39 @@ function mapTenantToConfig(tenant: {
   };
 }
 
-export async function getTenantFromHeaders(headers: Headers): Promise<TenantConfig | null> {
-  const host = headers.get("x-tenant-host") || headers.get("host") || "localhost";
-  const pathSlug = headers.get("x-tenant-slug");
+/**
+ * Dedup por request (React.cache) + cache de datos (unstable_cache, 120s).
+ * En panel/admin usar revalidateTenantPublic() tras mutaciones.
+ */
+const getTenantCachedByKeys = cache(async (host: string, pathSlug: string) => {
+  return unstable_cache(
+    async () => {
+      const row = await fetchTenantRowFromDb(host, pathSlug);
+      return row ? mapTenantToConfig(row) : null;
+    },
+    ["tenant-public", host, pathSlug],
+    { revalidate: 120, tags: [TENANT_PUBLIC_TAG] }
+  )();
+});
 
-  let tenant = await getTenantByDomain(host);
-  if (!tenant && pathSlug) {
-    tenant = await getTenantBySlug(pathSlug);
-  }
-  return tenant;
+export async function getTenantFromHeaders(
+  headers: Headers
+): Promise<TenantConfig | null> {
+  const host = headers.get("x-tenant-host") || headers.get("host") || "localhost";
+  const pathSlug = headers.get("x-tenant-slug") ?? "";
+  return getTenantCachedByKeys(host, pathSlug);
+}
+
+export async function getTenantByDomain(
+  hostname: string
+): Promise<TenantConfig | null> {
+  return getTenantCachedByKeys(hostname, "");
+}
+
+export async function getTenantBySlug(
+  slug: string
+): Promise<TenantConfig | null> {
+  return getTenantCachedByKeys("", slug.trim().toLowerCase());
 }
 
 export async function getTenantById(id: string) {

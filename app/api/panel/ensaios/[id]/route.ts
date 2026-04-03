@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPanelSession } from "@/lib/auth";
+import { revalidateTenantPublic } from "@/lib/revalidate-public";
 
 export async function PUT(
   req: NextRequest,
@@ -33,6 +34,7 @@ export async function PUT(
         active: data.active,
       },
     });
+    revalidateTenantPublic();
     return NextResponse.json({ ensaio });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Erro ao atualizar ensaio";
@@ -57,5 +59,6 @@ export async function DELETE(
     return NextResponse.json({ error: "Ensaio não encontrado" }, { status: 404 });
 
   await prisma.ensaio.delete({ where: { id } });
+  revalidateTenantPublic();
   return NextResponse.json({ success: true });
 }

@@ -112,7 +112,7 @@ export default function PhotoDetailPageContent({
                 </div>
               )}
 
-              <div className="rounded-2xl border border-stone-200/80 bg-white p-5 shadow-[0_2px_16px_-4px_rgba(0,0,0,0.07)] sm:p-6">
+              <div className="rounded-sm border border-stone-200/80 bg-white p-5 shadow-[0_2px_16px_-4px_rgba(0,0,0,0.07)] sm:p-6">
                 <p className="font-sans text-sm leading-relaxed text-stone-500">
                   <span className="font-medium text-stone-700">
                     Edição fine art.
@@ -124,7 +124,7 @@ export default function PhotoDetailPageContent({
             </div>
 
             <aside className="lg:col-span-5">
-              <div className="sticky top-28 overflow-hidden rounded-2xl border border-stone-200/70 bg-white shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)]">
+              <div className="sticky top-28 overflow-hidden rounded-sm border border-stone-200/70 bg-white shadow-[0_8px_32px_-12px_rgba(0,0,0,0.12)]">
                 <div
                   className="h-1 w-full shrink-0"
                   style={{ backgroundColor: colorPrimary }}

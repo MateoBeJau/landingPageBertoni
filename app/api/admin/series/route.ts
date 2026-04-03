@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/auth";
+import { revalidateTenantPublic } from "@/lib/revalidate-public";
 import { slugify } from "@/lib/slugify";
 
 async function ensurePhotoForSeries(
@@ -131,6 +132,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    revalidateTenantPublic();
     return NextResponse.json({ series }, { status: 201 });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Erro ao criar série";

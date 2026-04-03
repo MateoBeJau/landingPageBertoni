@@ -1,11 +1,15 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getTenantFromHeaders } from "@/lib/tenant";
-import { TenantProvider } from "@/components/TenantProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PhotoDetailPageContent from "@/components/PhotoDetailPageContent";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
+
+function homePathFromHeaders(headersList: Headers): string {
+  const pathSlug = headersList.get("x-tenant-slug")?.trim();
+  return pathSlug ? `/${pathSlug}` : "/";
+}
 
 export default async function PhotoPage({
   params,
@@ -14,25 +18,29 @@ export default async function PhotoPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ category?: string }>;
 }) {
-  const { slug } = await params;
+  const raw = (await params).slug;
+  const slug = decodeURIComponent(raw).trim();
   const { category } = await searchParams;
   const headersList = await headers();
   const tenant = await getTenantFromHeaders(headersList);
 
   if (!tenant) notFound();
 
-  const photo = tenant.photos.find((p) => p.slug === slug);
+  const photo =
+    tenant.photos.find((p) => p.slug === slug) ||
+    tenant.photos.find((p) => p.id === slug);
   if (!photo) notFound();
 
   const whatsappMsg = `Olá, tenho interesse na foto "${photo.title}" do seu portfólio. Poderia me passar mais informações sobre valores e formatos disponíveis?`;
   const whatsappLink = buildWhatsAppUrl(tenant.whatsappNumber, whatsappMsg);
 
+  const home = homePathFromHeaders(headersList);
   const backHref = category
-    ? `/?category=${encodeURIComponent(category)}#foto-unica`
-    : "/#foto-unica";
+    ? `${home}?category=${encodeURIComponent(category)}#foto-unica`
+    : `${home}#foto-unica`;
 
   return (
-    <TenantProvider tenant={tenant}>
+    <>
       <Header />
       <PhotoDetailPageContent
         colorPrimary={tenant.colorPrimary}
@@ -52,6 +60,6 @@ export default async function PhotoPage({
         backLabel="Voltar para galeria"
       />
       <Footer />
-    </TenantProvider>
+    </>
   );
 }

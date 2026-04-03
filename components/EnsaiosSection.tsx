@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { shouldOptimizeNextImage } from "@/lib/should-optimize-image";
 import { motion, Variants } from "framer-motion";
 import { ChevronRight, BookOpen } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
@@ -68,7 +69,7 @@ export default function EnsaiosSection() {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                     onContextMenu={(e) => e.preventDefault()}
-                    unoptimized={ensaio.cover.includes("blob.vercel-storage.com")}
+                    unoptimized={!shouldOptimizeNextImage(ensaio.cover)}
                   />
                 ) : (
                   <div className="absolute inset-0 flex items-center justify-center text-stone-400">

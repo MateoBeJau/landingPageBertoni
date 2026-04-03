@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getAdminSession } from "@/lib/auth";
+import { revalidateTenantPublic } from "@/lib/revalidate-public";
 
 export async function GET() {
   const session = await getAdminSession();
@@ -57,6 +58,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    revalidateTenantPublic();
     return NextResponse.json({ tenant }, { status: 201 });
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Erro ao criar tenant";
