@@ -7,15 +7,31 @@ import { useTenant } from "@/components/TenantProvider";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const defaultHighlights = [
-  { icon: Camera, label: "15+ anos de experiência", desc: "Fotografando o Sul e o Brasil" },
-  { icon: Award, label: "Impressões de alta qualidade", desc: "Papel Fine Art e Canvas" },
-  { icon: MapPin, label: "Porto Alegre, RS", desc: "Atendimento em todo o Brasil" },
+  {
+    icon: Camera,
+    label: "15+ anos de experiência",
+    desc: "Projetos Culturais",
+  },
+  {
+    icon: Award,
+    label: "Impressões de alta qualidade",
+    desc: "Papel Fotográfico, Fine Art e Canvas",
+  },
+  {
+    icon: MapPin,
+    label: "De Porto Alegre para todo o Brasil",
+    desc: "",
+  },
 ];
 
 export default function AboutSection() {
   const tenant = useTenant();
   const highlights = (tenant.aboutHighlights && tenant.aboutHighlights.length >= 3)
-    ? defaultHighlights.map((d, i) => ({ ...d, label: tenant.aboutHighlights![i].label, desc: tenant.aboutHighlights![i].desc }))
+    ? defaultHighlights.map((d, i) => ({
+        ...d,
+        label: tenant.aboutHighlights![i].label,
+        desc: tenant.aboutHighlights![i].desc ?? "",
+      }))
     : defaultHighlights;
   const whatsappLink = buildWhatsAppUrl(
     tenant.whatsappNumber,
@@ -23,7 +39,7 @@ export default function AboutSection() {
   );
 
   return (
-    <section id="sobre" className="py-20 md:py-28 bg-stone-950">
+    <section id="bio" className="py-20 md:py-28 bg-stone-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Image side */}
@@ -61,7 +77,7 @@ export default function AboutSection() {
               className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
               style={{ color: tenant.colorPrimary }}
             >
-              {tenant.aboutSectionLabel || "Sobre o Fotógrafo"}
+              {tenant.aboutSectionLabel || "BIO"}
             </span>
             <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl text-white font-semibold mb-6 leading-tight">
               {tenant.name}
@@ -80,7 +96,9 @@ export default function AboutSection() {
                 <div key={item.label} className="flex flex-col gap-1 border border-stone-800 rounded-sm p-4">
                   <item.icon size={18} className="mb-1" style={{ color: tenant.colorPrimary }} />
                   <p className="font-sans text-white text-sm font-medium">{item.label}</p>
-                  <p className="font-sans text-stone-500 text-xs">{item.desc}</p>
+                  {item.desc ? (
+                    <p className="font-sans text-stone-500 text-xs">{item.desc}</p>
+                  ) : null}
                 </div>
               ))}
             </div>

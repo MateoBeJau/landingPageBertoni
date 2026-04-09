@@ -6,9 +6,9 @@ import { useTenant } from "@/components/TenantProvider";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
 
 const navLinks = [
-  { label: "Fotografia Única", hash: "#foto-unica" },
+  { label: "Foto Única", hash: "#foto-unica" },
   { label: "Séries", hash: "#series" },
-  { label: "Sobre", hash: "#sobre" },
+  { label: "BIO", hash: "#bio" },
   { label: "Contato", hash: "#contato" },
 ];
 
@@ -98,9 +98,6 @@ export default function Footer() {
               </li>
               <li className="font-sans text-stone-400 text-sm">
                 Formatos sob encomenda
-              </li>
-              <li className="font-sans text-stone-500 text-xs mt-1 italic">
-                Valores combinados via WhatsApp
               </li>
             </ul>
           </div>

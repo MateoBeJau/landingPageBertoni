@@ -1,6 +1,5 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
 import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
 import { buildWhatsAppUrl } from "@/lib/whatsapp";
@@ -10,8 +9,14 @@ export default function ContactBanner() {
 
   const whatsappLink = buildWhatsAppUrl(
     tenant.whatsappNumber,
-    "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra."
+    "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e as opções de impressão e curadoria."
   );
+
+  const defaultTitle = "Interessado em alguma imagem?";
+  const defaultBody =
+    "Fale comigo pelo WhatsApp. Tiro dúvidas sobre tamanhos, valores e impressões (Fine Art, Canvas, papel fotográfico).\n\nAlém da venda de fotos, ofereço curadoria sob medida para decoração, publicidade, eventos, coleções empresariais e muito mais. Atendimento personalizado do início ao fim.";
+  const title = (tenant.contactTitle && tenant.contactTitle.trim()) || defaultTitle;
+  const bodyText = (tenant.contactText && tenant.contactText.trim()) || defaultBody;
 
   return (
     <section
@@ -48,11 +53,13 @@ export default function ContactBanner() {
           Contato
         </p>
         <h2 className="mx-auto max-w-2xl font-sans text-2xl font-semibold leading-tight tracking-tight text-white sm:text-3xl md:text-[2rem] md:leading-[1.2] lg:text-[2.25rem]">
-          {tenant.contactTitle}
+          {title}
         </h2>
-        <p className="mx-auto mt-4 max-w-xl font-sans text-[0.9375rem] leading-[1.7] text-white/80 sm:mt-5 sm:text-base">
-          {tenant.contactText}
-        </p>
+        <div className="mx-auto mt-4 max-w-2xl space-y-4 font-sans text-[0.9375rem] leading-[1.7] text-white/80 sm:mt-5 sm:text-base">
+          {bodyText.split(/\n\n+/).map((p) => p.trim()).filter(Boolean).map((paragraph, i) => (
+            <p key={i} className="whitespace-pre-line">{paragraph}</p>
+          ))}
+        </div>
 
         <div className="mt-8 flex flex-col items-center gap-4 sm:mt-10">
           <a
@@ -63,12 +70,13 @@ export default function ContactBanner() {
             style={{ backgroundColor: tenant.colorCta }}
           >
             <WhatsAppIcon size={20} className="shrink-0 opacity-95" />
-            <span>{tenant.contactCta || "Consultar via WhatsApp"}</span>
+            <span>{tenant.contactCta || "Fale comigo pelo WhatsApp"}</span>
           </a>
-          <p className="max-w-md font-sans text-xs leading-relaxed text-white/55 sm:text-[13px]">
-            {tenant.contactSubtext ||
-              "Valores e formas de pagamento combinados diretamente via WhatsApp"}
-          </p>
+          {tenant.contactSubtext?.trim() ? (
+            <p className="max-w-md font-sans text-xs leading-relaxed text-white/55 sm:text-[13px]">
+              {tenant.contactSubtext}
+            </p>
+          ) : null}
         </div>
       </div>
     </section>

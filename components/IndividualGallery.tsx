@@ -7,9 +7,7 @@ import { shouldOptimizeNextImage } from "@/lib/should-optimize-image";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { motion, Variants } from "framer-motion";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
-import WhatsAppIcon from "@/components/icons/WhatsAppIcon";
 import { useTenant } from "@/components/TenantProvider";
-import { buildWhatsAppUrl } from "@/lib/whatsapp";
 import type { TenantPhoto } from "@/lib/types";
 
 const containerVariants: Variants = {
@@ -28,8 +26,9 @@ function photosForCategory(
   photos: TenantPhoto[],
   category: string
 ): TenantPhoto[] {
+  const cat = category.trim();
   return photos
-    .filter((p) => p.category === category)
+    .filter((p) => (p.category?.trim() || "") === cat)
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
@@ -42,13 +41,25 @@ export default function IndividualGallery() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const slideRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const categoriesWithPhotos = useMemo(
-    () =>
-      tenant.categories
-        .filter((c) => c !== "Todas")
-        .filter((c) => tenant.photos.some((p) => p.category === c)),
-    [tenant.categories, tenant.photos]
-  );
+  /** Categorias do tenant + categorias usadas nas fotos (como no painel). */
+  const categoriesWithPhotos = useMemo(() => {
+    const fromConfig = tenant.categories
+      .map((c) => c.trim())
+      .filter((c) => c.length > 0 && c !== "Todas");
+    const fromPhotos = [
+      ...new Set(
+        tenant.photos
+          .map((p) => p.category?.trim())
+          .filter((c): c is string => Boolean(c && c.length > 0))
+      ),
+    ];
+    const merged = [...new Set([...fromConfig, ...fromPhotos])].sort((a, b) =>
+      a.localeCompare(b, "pt", { sensitivity: "base" })
+    );
+    return merged.filter((c) =>
+      tenant.photos.some((p) => (p.category?.trim() || "") === c)
+    );
+  }, [tenant.categories, tenant.photos]);
 
   const displayedCategories = useMemo(
     () => categoriesWithPhotos.slice(0, MAX_CATEGORY_CARDS),
@@ -151,26 +162,19 @@ export default function IndividualGallery() {
     });
   }, []);
 
-  const whatsappGenericMessage =
-    "Olá! Gostaria de saber mais sobre o seu trabalho fotográfico e os formatos disponíveis para compra.";
-  const whatsappGenericHref = buildWhatsAppUrl(
-    tenant.whatsappNumber,
-    whatsappGenericMessage
-  );
-
   return (
     <section id="foto-unica" className="py-20 md:py-28 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 md:mb-16">
+          <h2 className="font-sans text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl md:text-5xl">
+            {tenant.sectionFotoUnicaTitle || "Foto Única"}
+          </h2>
           <span
-            className="inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold mb-3"
+            className="mt-3 inline-block font-sans text-xs uppercase tracking-[0.25em] font-semibold"
             style={{ color: tenant.colorPrimary }}
           >
             {tenant.sectionFotoUnicaBadge || "Portfólio"}
           </span>
-          <h2 className="font-sans text-3xl font-semibold tracking-tight text-stone-900 sm:text-4xl md:text-5xl">
-            {tenant.sectionFotoUnicaTitle || "Foto Única"}
-          </h2>
         </div>
 
         {categoriesWithPhotos.length === 0 ? (
@@ -178,7 +182,12 @@ export default function IndividualGallery() {
             Nenhuma categoria com fotos por enquanto.
           </p>
         ) : !selectedCategory ? (
-          <motion.div
+          <>
+            <p className="mb-6 text-center font-sans text-sm text-stone-600 md:mb-8">
+              Categorias das fotos (altere a categoria de cada imagem no painel —
+              novas etiquetas passam a aparecer aqui com as fotos correspondentes).
+            </p>
+            <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -217,6 +226,7 @@ export default function IndividualGallery() {
               );
             })}
           </motion.div>
+          </>
         ) : (
           <div className="space-y-8">
             <div className="flex justify-center sm:justify-start">
@@ -335,23 +345,6 @@ export default function IndividualGallery() {
             </div>
           </div>
         )}
-
-        <div className="text-center mt-12 md:mt-16">
-          <p className="font-sans text-stone-500 text-sm mb-4">
-            {tenant.sectionFotoUnicaSubtext ||
-              "Valores e formatos combinados diretamente via WhatsApp"}
-          </p>
-          <a
-            href={whatsappGenericHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 font-sans text-sm font-semibold tracking-wide text-white shadow-md shadow-black/10 transition-[filter,transform] hover:brightness-105 active:scale-[0.99]"
-            style={{ backgroundColor: tenant.colorCta }}
-          >
-            <WhatsAppIcon size={15} />
-            {tenant.sectionFotoUnicaCta || "Consultar Valores"}
-          </a>
-        </div>
       </div>
     </section>
   );

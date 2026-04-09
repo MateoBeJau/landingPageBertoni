@@ -3,6 +3,7 @@
 import { use, useEffect, useState, useCallback, useMemo } from "react";
 import Link from "next/link";
 import CategoryTags from "@/components/CategoryTags";
+import { usePagedPhotos } from "@/lib/use-paged-photos";
 import {
   Settings,
   Palette,
@@ -351,6 +352,13 @@ export default function TenantEditorPage({
     printType: "",
     order: 0,
   });
+
+  const {
+    visible: adminGridPhotos,
+    total: adminGridTotal,
+    hasMore: adminGridHasMore,
+    loadMore: loadMoreAdminGrid,
+  } = usePagedPhotos(tenant?.photos, id ?? "");
 
   const showToast = useCallback((type: "success" | "error", message: string) => {
     setToast({ type, message });
@@ -1884,7 +1892,7 @@ export default function TenantEditorPage({
               </div>
               <div className="p-5">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                  {tenant.photos?.map((photo) => (
+                  {adminGridPhotos.map((photo, idx) => (
                     <div
                       key={photo.id}
                       className="group relative bg-stone-50 rounded-xl border border-stone-200 overflow-hidden hover:border-stone-300 transition-colors"
@@ -1894,6 +1902,8 @@ export default function TenantEditorPage({
                           src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
                           alt={photo.title}
                           className="w-full h-full object-cover"
+                          loading={idx < 8 ? "eager" : "lazy"}
+                          decoding="async"
                         />
                         <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
@@ -1925,6 +1935,20 @@ export default function TenantEditorPage({
                     </div>
                   ))}
                 </div>
+                {adminGridHasMore && adminGridTotal > 0 && (
+                  <div className="mt-6 flex flex-col items-center gap-2 border-t border-stone-100 pt-5">
+                    <p className="text-xs text-stone-500">
+                      Mostrando {adminGridPhotos.length} de {adminGridTotal} fotos
+                    </p>
+                    <button
+                      type="button"
+                      onClick={loadMoreAdminGrid}
+                      className="rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 shadow-sm transition-colors hover:bg-stone-50"
+                    >
+                      Carregar mais fotos
+                    </button>
+                  </div>
+                )}
                 {(!tenant.photos || tenant.photos.length === 0) && (
                   <div className="text-center py-12 text-stone-500">
                     <Image className="w-12 h-12 mx-auto mb-3 opacity-50" />

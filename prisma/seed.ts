@@ -50,7 +50,9 @@ async function main() {
         "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=85",
       contactTitle: "Interessado em alguma imagem?",
       contactText:
-        "Entre em contato pelo WhatsApp para consultar valores, formatos de impressão disponíveis e condições exclusivas. Atendimento personalizado para colecionadores, decoradores e amantes da fotografia.",
+        "Fale comigo pelo WhatsApp. Tiro dúvidas sobre tamanhos, valores e impressões (Fine Art, Canvas, papel fotográfico).\n\nAlém da venda de fotos, ofereço curadoria sob medida para decoração, publicidade, eventos, coleções empresariais e muito mais. Atendimento personalizado do início ao fim.",
+      contactCta: "Fale comigo pelo WhatsApp",
+      contactSubtext: null,
       stat1Value: "—",
       stat1Label: "Foto Única",
       stat2Value: "—",

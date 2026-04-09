@@ -6,12 +6,12 @@ import { Menu, X, Camera } from "lucide-react";
 import { useTenant } from "@/components/TenantProvider";
 
 const navLinksBeforeInstagram = [
-  { label: "Fotografia Única", hash: "#foto-unica" },
+  { label: "Foto Única", hash: "#foto-unica" },
   { label: "Séries", hash: "#series" },
 ];
 
 const navLinksAfterInstagram = [
-  { label: "Sobre", hash: "#sobre" },
+  { label: "BIO", hash: "#bio" },
   { label: "Contato", hash: "#contato" },
 ];
 

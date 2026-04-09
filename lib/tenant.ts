@@ -4,26 +4,131 @@ import { prisma } from "./prisma";
 import { TenantConfig } from "./types";
 import { TENANT_PUBLIC_TAG } from "./revalidate-public";
 
-const tenantPublicInclude = {
+/** Solo columnas que consume la landing / mapTenantToConfig (sin timestamps ni relaciones extra). */
+const tenantPublicSelect = {
+  id: true,
+  slug: true,
+  domain: true,
+  name: true,
+  subtitle: true,
+  whatsappNumber: true,
+  email: true,
+  maxPhotos: true,
+  colorPrimary: true,
+  colorAccent: true,
+  colorCta: true,
+  heroTitle: true,
+  heroSubtitle: true,
+  heroImage: true,
+  heroBadge: true,
+  aboutTitle: true,
+  aboutText1: true,
+  aboutText2: true,
+  aboutText3: true,
+  aboutImage: true,
+  contactTitle: true,
+  contactText: true,
+  stat1Value: true,
+  stat1Label: true,
+  stat2Value: true,
+  stat2Label: true,
+  stat3Value: true,
+  stat3Label: true,
+  stat4Value: true,
+  stat4Label: true,
+  categories: true,
+  instagramUrl: true,
+  facebookUrl: true,
+  metaTitle: true,
+  metaDescription: true,
+  sectionFotoUnicaBadge: true,
+  sectionFotoUnicaTitle: true,
+  sectionFotoUnicaDesc: true,
+  sectionFotoUnicaDesc2: true,
+  sectionFotoUnicaCta: true,
+  sectionFotoUnicaSubtext: true,
+  sectionSeriesBadge: true,
+  sectionSeriesTitle: true,
+  sectionSeriesDesc: true,
+  sectionSeriesModalLabel: true,
+  sectionSeriesVerSerie: true,
+  sectionSeriesClique: true,
+  sectionEnsaiosBadge: true,
+  sectionEnsaiosTitle: true,
+  sectionEnsaiosDesc: true,
+  sectionEnsaiosCta: true,
+  sectionEnsaiosCtaSubtext: true,
+  heroCtaWhatsApp: true,
+  heroCtaPortfolio: true,
+  heroScrollLabel: true,
+  contactCta: true,
+  contactSubtext: true,
+  aboutSectionLabel: true,
+  aboutYears: true,
+  aboutYearsLabel: true,
+  aboutCtaContact: true,
+  aboutCtaPortfolio: true,
+  aboutHighlights: true,
   photos: {
     where: { active: true },
     orderBy: { order: "asc" as const },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      location: true,
+      year: true,
+      description: true,
+      category: true,
+      imageSrc: true,
+      imageThumb: true,
+      price: true,
+      format: true,
+      printType: true,
+      order: true,
+    },
   },
   series: {
     where: { active: true },
     orderBy: { order: "asc" as const },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      subtitle: true,
+      description: true,
+      cover: true,
+      order: true,
       photos: {
         orderBy: { order: "asc" as const },
-        include: { photo: true },
+        select: {
+          id: true,
+          title: true,
+          location: true,
+          year: true,
+          imageSrc: true,
+          imageThumb: true,
+          order: true,
+          photo: { select: { slug: true } },
+        },
       },
     },
   },
   ensaios: {
     where: { active: true },
     orderBy: { order: "asc" as const },
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      subtitle: true,
+      description: true,
+      cover: true,
+      priceInfo: true,
+      order: true,
+    },
   },
-};
+} as const;
 
 async function fetchTenantRowFromDb(host: string, pathSlug: string) {
   const trimmedHost = host.trim();
@@ -42,7 +147,7 @@ async function fetchTenantRowFromDb(host: string, pathSlug: string) {
           { slug: withoutWww.split(".")[0] },
         ],
       },
-      include: tenantPublicInclude,
+      select: tenantPublicSelect,
     });
     if (tenant) return tenant;
   }
@@ -50,7 +155,7 @@ async function fetchTenantRowFromDb(host: string, pathSlug: string) {
   if (pathSlug.trim()) {
     return prisma.tenant.findFirst({
       where: { active: true, slug: pathSlug.trim().toLowerCase() },
-      include: tenantPublicInclude,
+      select: tenantPublicSelect,
     });
   }
 
@@ -301,9 +406,11 @@ function mapTenantToConfig(tenant: {
 }
 
 /**
- * Dedup por request (React.cache) + cache de datos (unstable_cache, 120s).
- * En panel/admin usar revalidateTenantPublic() tras mutaciones.
+ * Dedup por request (React.cache) + cache de datos (unstable_cache).
+ * Mutaciones deben llamar revalidateTenantPublic() para invalidar el tag.
  */
+const PUBLIC_TENANT_REVALIDATE_SECONDS = 300;
+
 const getTenantCachedByKeys = cache(async (host: string, pathSlug: string) => {
   return unstable_cache(
     async () => {
@@ -311,7 +418,10 @@ const getTenantCachedByKeys = cache(async (host: string, pathSlug: string) => {
       return row ? mapTenantToConfig(row) : null;
     },
     ["tenant-public", host, pathSlug],
-    { revalidate: 120, tags: [TENANT_PUBLIC_TAG] }
+    {
+      revalidate: PUBLIC_TENANT_REVALIDATE_SECONDS,
+      tags: [TENANT_PUBLIC_TAG],
+    }
   )();
 });
 

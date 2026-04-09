@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePanelContext } from "../layout";
+import { usePagedPhotos } from "@/lib/use-paged-photos";
 import {
   Image,
   Plus,
@@ -59,6 +60,13 @@ export default function PanelFotosPage() {
     printType: "",
     order: 0,
   });
+
+  const {
+    visible: gridPhotos,
+    total: gridTotal,
+    hasMore: gridHasMore,
+    loadMore: loadMoreGrid,
+  } = usePagedPhotos(tenant?.photos, tenant?.id ?? "");
 
   if (loading || !tenant) {
     return (
@@ -243,7 +251,7 @@ export default function PanelFotosPage() {
         <div className="rounded-xl border border-stone-200 bg-white shadow-sm">
           <div className="p-5">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-              {tenant.photos?.map((photo) => (
+              {gridPhotos.map((photo, idx) => (
                 <div
                   key={photo.id}
                   className="group relative overflow-hidden rounded-xl border border-stone-200 bg-stone-50 transition-colors hover:border-stone-300"
@@ -253,6 +261,8 @@ export default function PanelFotosPage() {
                       src={photo.imageThumb || photo.imageSrc || "/placeholder.svg"}
                       alt={photo.title}
                       className="h-full w-full object-cover"
+                      loading={idx < 8 ? "eager" : "lazy"}
+                      decoding="async"
                     />
                     <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
                       <button
@@ -280,6 +290,20 @@ export default function PanelFotosPage() {
                 </div>
               ))}
             </div>
+            {gridHasMore && gridTotal > 0 && (
+              <div className="mt-6 flex flex-col items-center gap-2 border-t border-stone-100 pt-5">
+                <p className="text-xs text-stone-500">
+                  Mostrando {gridPhotos.length} de {gridTotal} fotos
+                </p>
+                <button
+                  type="button"
+                  onClick={loadMoreGrid}
+                  className="rounded-lg border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-800 shadow-sm transition-colors hover:bg-stone-50"
+                >
+                  Carregar mais fotos
+                </button>
+              </div>
+            )}
             {(!tenant.photos || tenant.photos.length === 0) && (
               <div className="py-12 text-center text-stone-500">
                 <Image className="mx-auto mb-3 h-12 w-12 opacity-50" />

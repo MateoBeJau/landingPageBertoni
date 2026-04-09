@@ -2,10 +2,12 @@
 
 import Image from "next/image";
 import { useTenant } from "@/components/TenantProvider";
+import { shouldOptimizeNextImage } from "@/lib/should-optimize-image";
 import { ChevronDown } from "lucide-react";
 
 export default function HeroSection() {
   const tenant = useTenant();
+  const heroOptimized = shouldOptimizeNextImage(tenant.heroImage);
 
   return (
     <section
@@ -20,6 +22,7 @@ export default function HeroSection() {
           className="object-cover protected-image"
           priority
           sizes="100vw"
+          unoptimized={!heroOptimized}
         />
         <div className="absolute inset-0 bg-linear-to-b from-black/55 via-black/40 to-black/72" />
         <div className="absolute inset-0 bg-linear-to-r from-black/45 via-black/15 to-transparent" />
@@ -28,6 +31,10 @@ export default function HeroSection() {
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 pt-20 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-3xl">
+          <h1 className="mb-4 font-sans text-4xl font-semibold leading-[1.14] tracking-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl sm:leading-[1.12] md:mb-6 md:text-6xl lg:text-7xl">
+            {tenant.heroTitle}
+          </h1>
+
           <div
             className="mx-auto mb-6 flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-sans font-medium uppercase tracking-[0.18em] text-white/95 md:mb-8 md:px-5 md:py-2 md:text-[11px] md:tracking-[0.22em]"
             style={{ backgroundColor: `${tenant.colorPrimary}D9` }}
@@ -35,10 +42,6 @@ export default function HeroSection() {
             <span className="size-1.5 shrink-0 rounded-full bg-white/90" />
             {tenant.heroBadge}
           </div>
-
-          <h1 className="mb-4 font-sans text-4xl font-semibold leading-[1.14] tracking-tight text-white drop-shadow-[0_2px_24px_rgba(0,0,0,0.45)] sm:text-5xl sm:leading-[1.12] md:mb-6 md:text-6xl lg:text-7xl">
-            {tenant.heroTitle}
-          </h1>
 
           <div className="mx-auto mb-10 max-w-2xl space-y-4 font-sans text-base leading-relaxed text-stone-100/95 drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)] sm:text-lg md:mb-12 md:text-xl md:leading-relaxed">
             {tenant.heroSubtitle
