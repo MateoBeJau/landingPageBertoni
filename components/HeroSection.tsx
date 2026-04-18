@@ -8,6 +8,7 @@ import { ChevronDown } from "lucide-react";
 export default function HeroSection() {
   const tenant = useTenant();
   const heroOptimized = shouldOptimizeNextImage(tenant.heroImage);
+  const heroBadgeText = tenant.heroBadge?.trim() ?? "";
 
   return (
     <section
@@ -35,13 +36,15 @@ export default function HeroSection() {
             {tenant.heroTitle}
           </h1>
 
-          <div
-            className="mx-auto mb-6 flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-sans font-medium uppercase tracking-[0.18em] text-white/95 md:mb-8 md:px-5 md:py-2 md:text-[11px] md:tracking-[0.22em]"
-            style={{ backgroundColor: `${tenant.colorPrimary}D9` }}
-          >
-            <span className="size-1.5 shrink-0 rounded-full bg-white/90" />
-            {tenant.heroBadge}
-          </div>
+          {heroBadgeText ? (
+            <div
+              className="mx-auto mb-6 flex w-fit items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-sans font-medium uppercase tracking-[0.18em] text-white/95 md:mb-8 md:px-5 md:py-2 md:text-[11px] md:tracking-[0.22em]"
+              style={{ backgroundColor: `${tenant.colorPrimary}D9` }}
+            >
+              <span className="size-1.5 shrink-0 rounded-full bg-white/90" />
+              {heroBadgeText}
+            </div>
+          ) : null}
 
           <div className="mx-auto mb-10 max-w-2xl space-y-4 font-sans text-base leading-relaxed text-stone-100/95 drop-shadow-[0_1px_12px_rgba(0,0,0,0.35)] sm:text-lg md:mb-12 md:text-xl md:leading-relaxed">
             {tenant.heroSubtitle

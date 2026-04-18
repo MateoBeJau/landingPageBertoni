@@ -182,12 +182,7 @@ export default function IndividualGallery() {
             Nenhuma categoria com fotos por enquanto.
           </p>
         ) : !selectedCategory ? (
-          <>
-            <p className="mb-6 text-center font-sans text-sm text-stone-600 md:mb-8">
-              Categorias das fotos (altere a categoria de cada imagem no painel —
-              novas etiquetas passam a aparecer aqui com as fotos correspondentes).
-            </p>
-            <motion.div
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
@@ -226,7 +221,6 @@ export default function IndividualGallery() {
               );
             })}
           </motion.div>
-          </>
         ) : (
           <div className="space-y-8">
             <div className="flex justify-center sm:justify-start">
